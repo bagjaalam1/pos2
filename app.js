@@ -4,6 +4,16 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const { Pool } = require('pg')
+ 
+const pool = new Pool({
+  user: 'dbuser',
+  host: 'database.server.com',
+  database: 'mydb',
+  password: 'secretpassword',
+  port: 3211,
+})
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -11,16 +21,19 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+require('./app/routes/login.routes')(app)
+require('./app/routes/register.routes')(app)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
