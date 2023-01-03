@@ -5,7 +5,7 @@ module.exports = (app) => {
         res.render('login')
     })
 
-    router.post('/', (req, res) => {
+    router.post('/', (req, res) => {    
         res.render('login')
     })
 
