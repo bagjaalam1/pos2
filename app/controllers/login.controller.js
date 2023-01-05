@@ -1,4 +1,5 @@
 const db = require('../models/index')
+const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {
     try {
@@ -11,10 +12,12 @@ exports.login = async (req, res) => {
         }
         
         //cek password
-        if(rows[0].password != password){
-            throw "password salah!"
+        const match = await bcrypt.compare(password, rows[0].password);
+        if(!match){
+            throw 'password salah'
         }
 
+        req.session.user = rows[0]
         res.redirect('/')
     } catch (e) {
         res.send(e)

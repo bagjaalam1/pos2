@@ -2,12 +2,12 @@ module.exports = (app) => {
     const router = require('express').Router();
     const controller = require('../controllers/register.controller')
 
-    router.get('/', (req, res) => {
+    router.get('/register', (req, res) => {
         res.render('register')
     })
 
-    router.post('/', controller.register)
+    router.post('/register', controller.register)
 
-    app.use('/register', router)
+    app.use('/', router)
     return router;
 }

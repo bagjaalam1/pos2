@@ -3,10 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session')
 var flash = require('connect-flash');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
 var app = express();
 
@@ -20,11 +18,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use(session({
+  secret: 'rubicamp',
+  resave: false,
+  saveUninitialized: true,
+}))
+
+app.use(flash());
 
 require('./app/routes/login.routes')(app)
 require('./app/routes/register.routes')(app)
+require('./app/routes/dashboard.routes')(app)
+require('./app/routes/logout.routes')(app)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
