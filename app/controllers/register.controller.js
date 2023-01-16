@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
         //cek email
         const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email])
         if (rows.length > 0) {
-            throw "email email telah terdaftar"
+            throw "email telah terdaftar"
         }
         
         //hashing
@@ -22,9 +22,16 @@ exports.register = async (req, res) => {
 
         //register
         const createUser = await db.query('INSERT INTO users(name, email, password) VALUES($1, $2, $3)', [name, email, hash])
+        console.log(createUser)
 
+        req.flash('infoSuccess', "Berhasil didaftarkan, silakan login")
         res.redirect('/login')
     } catch (e) {
-        res.send(e)
+        req.flash('info', e)
+        res.redirect('register')
     }
+}
+
+exports.getRegister = (req, res) => {
+    res.render('register', { info: req.flash('info')})
 }

@@ -8,7 +8,7 @@ exports.login = async (req, res) => {
         //cek email
         const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email])
         if (rows.length == 0) {
-            throw "email email tidak terdaftar"
+            throw "email tidak terdaftar"
         }
         
         //cek password
@@ -20,6 +20,11 @@ exports.login = async (req, res) => {
         req.session.user = rows[0]
         res.redirect('/')
     } catch (e) {
-        res.send(e)
+        req.flash('info', e)
+        res.redirect('login')
     }
+}
+
+exports.getLogin = (req, res) => {
+    res.render('login', {info: req.flash('info'), infoSuccess: req.flash('infoSuccess') })
 }

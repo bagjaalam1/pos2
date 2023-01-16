@@ -1,85 +1,108 @@
 <!DOCTYPE html>
-<!-- saved from url=(0059)https://preview.colorlib.com/theme/bootstrap/login-form-14/ -->
 <html lang="en">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Login 04</title>
 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="/stylesheets/css" rel="stylesheet">
-    <link rel="stylesheet" href="/stylesheets/font-awesome.min.css">
-    <link rel="stylesheet" href="/stylesheets/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-    <script defer="" referrerpolicy="origin" src="/javascripts/s.js"></script>
-    <script
-        nonce="9f590dd7-1ccb-471c-be91-1b270e349394">(function (w, d) { !function (eK, eL, eM, eN) { eK.zarazData = eK.zarazData || {}; eK.zarazData.executed = []; eK.zaraz = { deferred: [], listeners: [] }; eK.zaraz.q = []; eK.zaraz._f = function (eO) { return function () { var eP = Array.prototype.slice.call(arguments); eK.zaraz.q.push({ m: eO, a: eP }) } }; for (const eQ of ["track", "set", "debug"]) eK.zaraz[eQ] = eK.zaraz._f(eQ); eK.zaraz.init = () => { var eR = eL.getElementsByTagName(eN)[0], eS = eL.createElement(eN), eT = eL.getElementsByTagName("title")[0]; eT && (eK.zarazData.t = eL.getElementsByTagName("title")[0].text); eK.zarazData.x = Math.random(); eK.zarazData.w = eK.screen.width; eK.zarazData.h = eK.screen.height; eK.zarazData.j = eK.innerHeight; eK.zarazData.e = eK.innerWidth; eK.zarazData.l = eK.location.href; eK.zarazData.r = eL.referrer; eK.zarazData.k = eK.screen.colorDepth; eK.zarazData.n = eL.characterSet; eK.zarazData.o = (new Date).getTimezoneOffset(); if (eK.dataLayer) for (const eX of Object.entries(Object.entries(dataLayer).reduce(((eY, eZ) => ({ ...eY[1], ...eZ[1] }))))) zaraz.set(eX[0], eX[1], { scope: "page" }); eK.zarazData.q = []; for (; eK.zaraz.q.length;) { const e_ = eK.zaraz.q.shift(); eK.zarazData.q.push(e_) } eS.defer = !0; for (const fa of [localStorage, sessionStorage]) Object.keys(fa || {}).filter((fc => fc.startsWith("_zaraz_"))).forEach((fb => { try { eK.zarazData["z_" + fb.slice(7)] = JSON.parse(fa.getItem(fb)) } catch { eK.zarazData["z_" + fb.slice(7)] = fa.getItem(fb) } })); eS.referrerPolicy = "origin"; eS.src = "/cdn-cgi/zaraz/s.js?z=" + btoa(encodeURIComponent(JSON.stringify(eK.zarazData))); eR.parentNode.insertBefore(eS, eR) };["complete", "interactive"].includes(eL.readyState) ? zaraz.init() : eK.addEventListener("DOMContentLoaded", zaraz.init) }(w, d, 0, "script"); })(window, document);</script>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Login</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/stylesheets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/stylesheets/css/sb-admin-2.min.css" rel="stylesheet">
+
 </head>
 
-<body>
-    <section class="ftco-section" style="background-color: blue;">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-12 col-lg-8">
-                    <div class="wrap d-md-flex">
-                        <div class="img" style="background-image: url(images/bg-1.jpg); background-color: black;">
-                            <img src="https://rubicamp.com/assets/img/logo@2x.png" alt="" width="430" height="160"
-                                class="" style="margin-top: 160px;">
-                        </div>
-                        <div class="login-wrap p-4 p-md-5">
-                            <div class="d-flex">
-                                <div class="w-100">
-                                    <h2 class="text-center mb-1">Point of Sales</h3>
-                                </div>
+<body class="bg-gradient-primary">
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block" style="background-color: black;">
+                                <img src="https://rubicamp.com/assets/img/logo@2x.png" alt="" width="455" height="160"
+                                class="" style="margin-top: 125px;">
                             </div>
-
-                            <hr>
-
-                            <div class="d-flex">
-                                <div class="w-100">
-                                    <h5 class="text-center mb-3">Wellcome Back</h3>
-                                </div>
-                            </div>
-
-                            <form action="" method="post" class="signin-form">
-                                <div class="form-floating mb-3">
-                                    <input type="email" id="form2Example1" class="form-control" name="email"/>
-                                    <label class="" for="form2Example1" >Email address</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="password" class="form-control" id="floatingPassword" placeholder="" name="password" required>
-                                    <label class="" for="floatingPassword">Password</label>
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input type="checkbox" class="form-check-input" id="chOption 2eck2" name="forget"
-                                        value="something">
-                                    <label class="form-check-label text-muted" for="check2"><small>Remember me</small></label>
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit"
-                                        class="form-control btn btn-primary rounded submit px-3">Login</button>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-center">
-                                    <div class="">
-                                        <a href="/">Forgot
-                                            Password?</a>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                    </div>
+                                    <form method="post" class="user">
+                                        <div class="form-group">
+                                            <input type="email" class="form-control form-control-user"
+                                                id="exampleInputEmail" aria-describedby="emailHelp"
+                                                placeholder="Enter Email Address..." name="email">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                id="exampleInputPassword" placeholder="Password" name="password">
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox" class="custom-control-input" id="customCheck">
+                                                <label class="custom-control-label" for="customCheck">Remember
+                                                    Me</label>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Login
+                                        </button>
+                                        <% if(info.length > 0) { %>
+                                            <div class="alert alert-danger" role="alert">
+                                                <%= info %>
+                                            </div>
+                                            <% } %>
+                                            <% if(infoSuccess.length > 0) { %>
+                                            <div class="alert alert-success" role="alert">
+                                                <%= infoSuccess %>
+                                            </div>
+                                        <% } %>
+                                    </form>
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="small" href="forgot-password.html">Forgot Password?</a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small" href="/register">Create an Account!</a>
                                     </div>
                                 </div>
-                            </form>
-                            <p class="text-center">Not a member? <a data-toggle="tab"
-                                    href="/register">Sign
-                                    Up</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
+
         </div>
-    </section>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
 
 </body>
 
