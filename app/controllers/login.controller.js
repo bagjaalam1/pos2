@@ -10,7 +10,7 @@ exports.login = async (req, res) => {
         if (rows.length == 0) {
             throw "email tidak terdaftar"
         }
-        
+
         //cek password
         const match = await bcrypt.compare(password, rows[0].password);
         if(!match){
