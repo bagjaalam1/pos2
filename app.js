@@ -26,10 +26,7 @@ app.use(session({
 
 app.use(flash());
 
-require('./app/routes/login.routes')(app)
-require('./app/routes/register.routes')(app)
-require('./app/routes/dashboard.routes')(app)
-require('./app/routes/logout.routes')(app)
+require('./app/routes/users.routes')(app)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
