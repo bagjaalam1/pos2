@@ -25,7 +25,6 @@ exports.login = async (req, res) => {
         }
 
         req.session.user = rows[0]
-        console.log(req.session)
         res.redirect('/')
     } catch (e) {
         req.flash('info', e)
@@ -88,7 +87,26 @@ exports.dashboard = async (req, res) => {
 exports.users = async (req, res) => {
     try {
         const user = req.session.user
-        res.render('users', { name: user.name })
+        const {} = req.query
+
+        const field = ['userid', 'email', 'name', 'role'];
+
+        const sortBy = field.includes(req.query.sortBy) ? req.query.sortBy : 'userid';
+        const sortMode = req.query.sortMode === 'desc' ? -1 : 1;
+
+        const url = req.url == '/' ? '/?page=1&sortBy=id&sortMode=asc' : req.url
+
+        let page = req.query.page || 1
+        const limit = req.query.display == 'all' ? 0 : req.query.display || 3;
+        const offset = page > 0 ? (page - 1) * limit : page = 1;
+
+        const totalResult = await db.query('SELECT COUNT(*) AS total FROM users')
+        const pages = Math.ceil(totalResult.rows[0].total / limit)
+
+        sql = 'SELECT * FROM users'
+        sql += ` LIMIT ${limit} OFFSET ${offset}`
+        const { rows } = await db.query(sql)
+        res.render('users', { name: user.name, rows: rows, page, pages, url, limit, offset, totalResult: totalResult.rows[0].total })
     } catch (e) {
         res.send(e)
     }
