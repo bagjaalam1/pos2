@@ -87,7 +87,7 @@ exports.dashboard = async (req, res) => {
 exports.users = async (req, res) => {
     try {
         const user = req.session.user
-        const {} = req.query
+        const { } = req.query
 
         const field = ['userid', 'email', 'name', 'role'];
 
@@ -106,8 +106,42 @@ exports.users = async (req, res) => {
         sql = 'SELECT * FROM users'
         sql += ` LIMIT ${limit} OFFSET ${offset}`
         const { rows } = await db.query(sql)
-        res.render('users', { name: user.name, rows: rows, page, pages, url, limit, offset, totalResult: totalResult.rows[0].total })
+        res.render('./users/users', { name: user.name, rows: rows, page, pages, url, limit, offset, totalResult: totalResult.rows[0].total, infoSuccess: req.flash('infoSuccess') })
     } catch (e) {
         res.send(e)
+    }
+}
+
+exports.getAddUser = async (req, res) => {
+    try {
+        const user = req.session.user
+        res.render('./users/addUser.ejs', { name: user.name, info: req.flash('info') })
+    } catch (e) {
+        res.send(e)
+    }
+}
+
+exports.addUser = async (req, res) => {
+    try {
+        const { email, name, password, roleRadio } = req.body
+
+        console.log(roleRadio)
+        //cek email
+        const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email])
+        if (rows.length > 0) {
+            throw "email telah terdaftar"
+        }
+
+        //hashing
+        const hash = bcrypt.hashSync(password, saltRounds);
+
+        //register
+        const createUser = await db.query('INSERT INTO users(name, email, password, role) VALUES($1, $2, $3, $4)', [name, email, hash, roleRadio])
+
+        req.flash('infoSuccess', 'Berhasi ditambahkan!')
+        res.redirect('/users')
+    } catch (e) {
+        req.flash('info', e)
+        res.redirect('/users/add')
     }
 }

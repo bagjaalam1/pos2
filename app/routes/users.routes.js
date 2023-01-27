@@ -18,6 +18,10 @@ module.exports = (app) => {
 
     router.get('/users', isLoggedIn, controller.users)
 
+    router.get('/users/add', isLoggedIn, controller.getAddUser)
+
+    router.post('/users/add', isLoggedIn, controller.addUser)
+
     app.use('/', router)
     return router;
 }
