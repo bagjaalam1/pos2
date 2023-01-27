@@ -145,3 +145,40 @@ exports.addUser = async (req, res) => {
         res.redirect('/users/add')
     }
 }
+
+exports.getEditUser = async (req, res) => {
+    try {
+        const user = req.session.user
+        const { userid } = req.params
+        const { rows } = await db.query('SELECT * FROM users WHERE userid = $1', [userid])
+        console.log(rows)
+        res.render('users/editUser.ejs', { name: user.name, item: rows[0], info: req.flash('info') })
+    } catch (e) {
+        res.send(e)
+    }
+}
+
+exports.editUser = async (req, res) => {
+    try {
+        const { name, email, roleRadio } = req.body
+        const { userid } = req.params
+
+        //cek email
+        const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email])
+        if (rows.length > 0) {
+            throw "Email sudah ada"
+        }
+
+        const editUser = await db.query(`UPDATE users SET 
+        name = $1,
+        email= $2,
+        role = $3
+        WHERE userid = $4`,
+        [name, email, roleRadio, userid])
+
+        res.redirect('/users')
+    } catch (e) {
+        req.flash('info', e)
+        res.redirect(`/users/edit/${req.params.userid}`)
+    }
+}

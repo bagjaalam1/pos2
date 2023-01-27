@@ -89,8 +89,12 @@
                                     <%= item.role %>
                                 </td>
                                 <td>
-                                    <a class="btn btn-success" href="#">Edit</a>
-                                    <a class="btn btn-danger" href="#">Hapus</a>
+                                    <a href="/users/edit/<%=item.userid%>" class="btn btn-success btn-circle">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-danger btn-circle">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                             <% }) %>
