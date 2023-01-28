@@ -26,6 +26,8 @@ module.exports = (app) => {
 
     router.post('/users/edit/:userid', isLoggedIn, controller.editUser)
 
+    router.get('/users/delete/:userid', isLoggedIn, controller.deleteUser)
+
     app.use('/', router)
     return router;
 }

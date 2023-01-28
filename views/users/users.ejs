@@ -9,149 +9,177 @@
     </div>
 
 
-    <% if(infoSuccess.length > 0) { %>
+    <% if(infoSuccess.length> 0) { %>
         <div class="alert alert-success" role="alert">
-            <%= infoSuccess %>  
+            <%= infoSuccess %>
         </div>
-    <% } %>
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            
-            <a href="/users/add" class="btn btn-primary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fas fa-plus"></i> 
-                </span>
-                <span class="text">Add</span>
-            </a>
+        <% } %>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
 
-        </div>
+                    <a href="/users/add" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">Add</span>
+                    </a>
 
-        <div class="card-body">
-
-
-            <div class="row">
-                <div class="col-sm-12 col-md-6">
-                    <div class="dataTables_length">
-                        <label>Show
-                            <select name="display" aria-controls="dataTable"
-                                class="custom-select custom-select-sm form-control form-control-sm"
-                                onchange="changeDisplay()">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="all">all</option>
-                            </select> entries
-                        </label>
-                    </div>
                 </div>
-                <div class="col-sm-12 col-md-6">
-                    <div id="dataTable_filter" class="dataTables_filter"><label>Search:<input type="search"
-                                class="form-control form-control-sm" placeholder="" aria-controls="dataTable"></label>
-                    </div>
-                </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
-                    aria-describedby="dataTable_info">
-                    <thead>
-                        <tr>
-                            <th>
-                                User ID
-                            </th>
-                            <th>
-                                Email
-                            </th>
-                            <th>
-                                Name
-                            </th>
-                            <th>
-                                Role
-                            </th>
-                            <th>
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% rows.forEach(item=> { %>
-                            <tr>
-                                <td>
-                                    <%= item.userid %>
-                                </td>
-                                <td>
-                                    <%= item.email %>
-                                </td>
-                                <td>
-                                    <%= item.name %>
-                                </td>
-                                <td>
-                                    <%= item.role %>
-                                </td>
-                                <td>
-                                    <a href="/users/edit/<%=item.userid%>" class="btn btn-success btn-circle">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-danger btn-circle">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <% }) %>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th rowspan="1" colspan="1">User ID</th>
-                            <th rowspan="1" colspan="1">Email</th>
-                            <th rowspan="1" colspan="1">Name</th>
-                            <th rowspan="1" colspan="1">Role</th>
-                            <th rowspan="1" colspan="1">Action</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div class="card-body">
 
 
-
-                <div class="d-sm-flex justify-content-between mb-4">
-                    <div class="col-sm-12 col-md-5">
-                        <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">Showing <%=
-                                (offset + 1) %> to <%= offset + rows.length %> of <%= totalResult %> entries</div>
-                    </div>
-
-                    <div class="col-sm-12 col-md-3">
-                        <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
-                            <ul class="pagination">
-                                <li class="page-item<%=page == 1 ? ' disabled' : '' %>">
-                                    <a class="page-link"
-                                        href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) - 1) <= 0 ? 1 : parseInt(page-1) }` ) %>">Previous</a>
-                                </li>
-                                <% for( let i=1; i <=pages; i++ ) { %>
-                                    <li class="page-item<%=page==i ? ' active' : '' %>"><a class="page-link"
-                                            href="<%= url =! '/users' ?  url.replace(`page=${page}`, `page=${i}`) : `/users?page=${i}&sortBy=id&sortMode=asc`%>">
-                                            <%= i %>
-                                        </a></li>
-                                    <% } %>
-                                        <li class="page-item<%=page == pages ? ' disabled' : '' %>">
-                                            <a class="page-link"
-                                                href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) + 1) > pages ? pages : (parseInt(page)+1) }` ) %>">Next</a>
-                                        </li>
-                            </ul>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="dataTables_length">
+                                <label>Show
+                                    <select name="display" aria-controls="dataTable"
+                                        class="custom-select custom-select-sm form-control form-control-sm"
+                                        onchange="changeDisplay()">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="all">all</option>
+                                    </select> entries
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div id="dataTable_filter" class="dataTables_filter"><label>Search:<input type="search"
+                                        class="form-control form-control-sm" placeholder=""
+                                        aria-controls="dataTable"></label>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
+                            aria-describedby="dataTable_info">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        User ID
+                                    </th>
+                                    <th>
+                                        Email
+                                    </th>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Role
+                                    </th>
+                                    <th>
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% rows.forEach(function (item, index) { %>
+                                    <tr>
+                                        <td>
+                                            <%= item.userid %>
+                                        </td>
+                                        <td>
+                                            <%= item.email %>
+                                        </td>
+                                        <td>
+                                            <%= item.name %>
+                                        </td>
+                                        <td>
+                                            <%= item.role %>
+                                        </td>
+                                        <td>
+                                            <a href="/users/edit/<%=item.userid%>" class="btn btn-success btn-circle">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="/users/delete/<%=item.userid%>" class="btn btn-danger btn-circle"
+                                                data-toggle="modal" data-target="#deleteModal<%=index%>">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Delete Modal-->
+                                    <div class="modal fade" id="deleteModal<%=index%>" tabindex="-1" role="dialog"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Deleted
+                                                        Confirmation?
+                                                    </h5>
+                                                    <button class="close" type="button" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">Are you sure, you want delete it?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary" type="button"
+                                                        data-dismiss="modal">No</button>
+                                                    <a class="btn btn-primary"
+                                                        href="/users/delete/<%=item.userid%>">
+                                                        Yes
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <% }) %>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th rowspan="1" colspan="1">User ID</th>
+                                    <th rowspan="1" colspan="1">Email</th>
+                                    <th rowspan="1" colspan="1">Name</th>
+                                    <th rowspan="1" colspan="1">Role</th>
+                                    <th rowspan="1" colspan="1">Action</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+
+
+                        <div class="d-sm-flex justify-content-between mb-4">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">
+                                    Showing <%= (offset + 1) %> to <%= offset + rows.length %> of <%= totalResult %>
+                                                entries</div>
+                            </div>
+
+                            <div class="col-sm-12 col-md-3">
+                                <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+                                    <ul class="pagination">
+                                        <li class="page-item<%=page == 1 ? ' disabled' : '' %>">
+                                            <a class="page-link"
+                                                href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) - 1) <= 0 ? 1 : parseInt(page-1) }` ) %>">Previous</a>
+                                        </li>
+                                        <% for( let i=1; i <=pages; i++ ) { %>
+                                            <li class="page-item<%=page==i ? ' active' : '' %>"><a class="page-link"
+                                                    href="<%= url =! '/users' ?  url.replace(`page=${page}`, `page=${i}`) : `/users?page=${i}&sortBy=id&sortMode=asc`%>">
+                                                    <%= i %>
+                                                </a></li>
+                                            <% } %>
+                                                <li class="page-item<%=page == pages ? ' disabled' : '' %>">
+                                                    <a class="page-link"
+                                                        href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) + 1) > pages ? pages : (parseInt(page)+1) }` ) %>">Next</a>
+                                                </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+            </div>
+
 
             </div>
-        </div>
-    </div>
+            <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
 
-
-    </div>
-    <!-- /.container-fluid -->
-    </div>
-    <!-- End of Main Content -->
-
-    <%- include('../partials/footer.ejs') %>
-
-    <script>
-        
-    </script>
+            <%- include('../partials/footer.ejs') %>

@@ -182,3 +182,15 @@ exports.editUser = async (req, res) => {
         res.redirect(`/users/edit/${req.params.userid}`)
     }
 }
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const { userid } = req.params
+        
+        const deleteUser = await db.query('DELETE FROM users WHERE userid = $1', [userid])
+        
+        res.redirect('/users')
+    } catch (e) {
+        res.send(e)
+    }
+}
