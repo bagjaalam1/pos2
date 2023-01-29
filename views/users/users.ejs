@@ -31,24 +31,20 @@
 
                     <div class="row">
                         <div class="col-sm-12 col-md-6">
-                            <div class="dataTables_length">
-                                <label>Show
-                                    <select name="display" aria-controls="dataTable"
-                                        class="custom-select custom-select-sm form-control form-control-sm"
-                                        onchange="changeDisplay()">
+                            <div class="dataTables_length" id="dataTable_length"><label>Show <select
+                                        name="dataTable_length" aria-controls="dataTable"
+                                        class="custom-select custom-select-sm form-control form-control-sm">
                                         <option value="10">10</option>
                                         <option value="25">25</option>
                                         <option value="50">50</option>
-                                        <option value="all">all</option>
-                                    </select> entries
-                                </label>
-                            </div>
+                                        <option value="100">100</option>
+                                    </select> entries</label></div>
                         </div>
                         <div class="col-sm-12 col-md-6">
-                            <div id="dataTable_filter" class="dataTables_filter"><label>Search:<input type="search"
-                                        class="form-control form-control-sm" placeholder=""
-                                        aria-controls="dataTable"></label>
-                            </div>
+                            <div id="dataTable_filter" class="dataTables_filter"><label>Search:
+                                <form action="" method="get"><input type="search"
+                                    class="form-control form-control-sm" placeholder="" aria-controls="dataTable"
+                                    id="search" name="searchValue"></form></label></div>
                         </div>
                     </div>
 
@@ -75,6 +71,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+
                                 <% rows.forEach(function (item, index) { %>
                                     <tr>
                                         <td>
@@ -119,8 +116,7 @@
                                                 <div class="modal-footer">
                                                     <button class="btn btn-secondary" type="button"
                                                         data-dismiss="modal">No</button>
-                                                    <a class="btn btn-primary"
-                                                        href="/users/delete/<%=item.userid%>">
+                                                    <a class="btn btn-primary" href="/users/delete/<%=item.userid%>">
                                                         Yes
                                                     </a>
                                                 </div>
@@ -149,7 +145,6 @@
                                     Showing <%= (offset + 1) %> to <%= offset + rows.length %> of <%= totalResult %>
                                                 entries</div>
                             </div>
-
                             <div class="col-sm-12 col-md-3">
                                 <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
                                     <ul class="pagination">
@@ -159,13 +154,13 @@
                                         </li>
                                         <% for( let i=1; i <=pages; i++ ) { %>
                                             <li class="page-item<%=page==i ? ' active' : '' %>"><a class="page-link"
-                                                    href="<%= url =! '/users' ?  url.replace(`page=${page}`, `page=${i}`) : `/users?page=${i}&sortBy=id&sortMode=asc`%>">
+                                                    href="<%= url.replace(`page=${page}`, `page=${i}`)%>">
                                                     <%= i %>
                                                 </a></li>
                                             <% } %>
                                                 <li class="page-item<%=page == pages ? ' disabled' : '' %>">
                                                     <a class="page-link"
-                                                        href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) + 1) > pages ? pages : (parseInt(page)+1) }` ) %>">Next</a>
+                                                        href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) + 1) > pages ? pages : parseInt(page)+1 }` ) %>">Next</a>
                                                 </li>
                                     </ul>
                                 </div>

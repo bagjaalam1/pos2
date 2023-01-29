@@ -87,26 +87,69 @@ exports.dashboard = async (req, res) => {
 exports.users = async (req, res) => {
     try {
         const user = req.session.user
-        const { } = req.query
+        const { searchValue } = req.query
 
         const field = ['userid', 'email', 'name', 'role'];
 
         const sortBy = field.includes(req.query.sortBy) ? req.query.sortBy : 'userid';
         const sortMode = req.query.sortMode === 'desc' ? -1 : 1;
 
-        const url = req.url == '/' ? '/?page=1&sortBy=id&sortMode=asc' : req.url
+        const url = req.url === '/users' || req.url === `/users?searchValue=${searchValue}` ? `/users?page=1&sortBy=id&sortMode=asc&searchValue=${searchValue || ''}` : req.url;
 
-        let page = req.query.page || 1
+
+        let page = req.query.page || 1  
         const limit = req.query.display == 'all' ? 0 : req.query.display || 3;
         const offset = page > 0 ? (page - 1) * limit : page = 1;
 
-        const totalResult = await db.query('SELECT COUNT(*) AS total FROM users')
+        const wheres = []
+        const values = []
+        //pencarian
+        if(searchValue){
+            wheres.push(`
+            name ilike '%' || $1 || '%' OR
+            email ilike '%' || $2 || '%'`)
+            values.push(searchValue, searchValue)
+        }
+
+        let sql = 'SELECT COUNT(*) AS total FROM users'
+
+        //kalau ada pencarian
+        if(wheres.length > 0) {
+            sql += ` WHERE ${wheres.join()}`
+        }
+
+        console.log(sql)
+        console.log(wheres)
+        console.log(searchValue)
+
+        //total page
+        const totalResult = await db.query(sql, values)
         const pages = Math.ceil(totalResult.rows[0].total / limit)
 
         sql = 'SELECT * FROM users'
+
+        //kalau ada pencarian
+        if(wheres.length > 0) {
+            sql += ` WHERE ${wheres.join()}`
+        }
+
         sql += ` LIMIT ${limit} OFFSET ${offset}`
-        const { rows } = await db.query(sql)
-        res.render('./users/users', { name: user.name, rows: rows, page, pages, url, limit, offset, totalResult: totalResult.rows[0].total, infoSuccess: req.flash('infoSuccess') })
+
+        const { rows } = await db.query(sql, values)
+
+        res.render('./users/users', { name: user.name, rows, page, pages, url, limit, offset, totalResult: totalResult.rows[0].total, infoSuccess: req.flash('infoSuccess'), searchRows: null })
+    } catch (e) {
+        res.send(e)
+    }
+}
+
+exports.searchUser = async (req, res) => {
+    try {
+        const { searchValue } = req.body
+
+        const { rows } = await db.query(`SELECT * FROM users WHERE name ilike '%' || $1 || '%'`, [searchValue])
+
+        res.send({ searchRows : rows })
     } catch (e) {
         res.send(e)
     }
