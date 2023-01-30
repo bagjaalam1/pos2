@@ -18,7 +18,8 @@
                 <div class="card-header py-3">
 
                     <a href="/users/add" class="btn btn-primary btn-icon-split">
-                        <span class="icon text-white-50">
+                        <span class="icon text-white-50"
+                            style="display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-plus"></i>
                         </span>
                         <span class="text">Add</span>
@@ -27,127 +28,163 @@
                 </div>
 
                 <div class="card-body">
-
-
-                    <div class="row">
-                        <div class="col-sm-12 col-md-6">
-                            <div class="dataTables_length" id="dataTable_length"><label>Show <select
-                                        name="dataTable_length" aria-controls="dataTable"
-                                        class="custom-select custom-select-sm form-control form-control-sm">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select> entries</label></div>
-                        </div>
-                        <div class="col-sm-12 col-md-6">
-                            <div id="dataTable_filter" class="dataTables_filter"><label>Search:
-                                <form action="" method="get"><input type="search"
-                                    class="form-control form-control-sm" placeholder="" aria-controls="dataTable"
-                                    id="search" name="searchValue"></form></label></div>
-                        </div>
-                    </div>
-
                     <div class="table-responsive">
-                        <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
-                            aria-describedby="dataTable_info">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        User ID
-                                    </th>
-                                    <th>
-                                        Email
-                                    </th>
-                                    <th>
-                                        Name
-                                    </th>
-                                    <th>
-                                        Role
-                                    </th>
-                                    <th>
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_length">
+                                  <label class="d-flex"> Show
+                                    <form action="/users" method="get">
+                                      <select name="display" aria-controls="dataTable" class="custom-select custom-select-sm form-control form-control-sm">
+                                        <option value="3" <%=display==3 ? 'selected' : '' %>>3</option>
+                                        <option value="10" <%=display==10 ? 'selected' : '' %>>10</option>
+                                        <option value="100" <%=display==100 ? 'selected' : '' %>>100</option>
+                                      </select> 
+                                      <input type="hidden" name="page" value="1">
+                                      <input type="hidden" name="sortBy" value="<%=sortBy%>">
+                                      <input type="hidden" name="sortMode" value="<%=sortMode%>">
+                                      <input type="hidden" name="searchValue" value="<%=searchValue%>">
+                                    </form>entries
+                                  </label>
+                                </div>
+                              </div>
+                              <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_filter">
+                                  <label class="d-flex">Search:
+                                    <form action="" method="get">
+                                      <input type="hidden" name="page" value="1">
+                                      <input type="hidden" name="sortBy" value="<%=sortBy%>">
+                                      <input type="hidden" name="sortMode" value="<%sortMode%>">
+                                      <input type="hidden" name="display" value="<%=display%>">
+                                      <input type="search" class="form-control form-control-sm" placeholder="" aria-controls="dataTable" id="search" name="searchValue" value="<%= searchValue %>">
+                                    </form>
+                                  </label>
+                                </div>
+                              </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
+                                    aria-describedby="dataTable_info">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=userid`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'userid' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    User ID
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=email`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'email' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Email
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=name`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'name' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Name
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=role`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'role' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Role
+                                                </a>
+                                            </th>
+                                            <th class="text-gray-800">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                <% rows.forEach(function (item, index) { %>
-                                    <tr>
-                                        <td>
-                                            <%= item.userid %>
-                                        </td>
-                                        <td>
-                                            <%= item.email %>
-                                        </td>
-                                        <td>
-                                            <%= item.name %>
-                                        </td>
-                                        <td>
-                                            <%= item.role %>
-                                        </td>
-                                        <td>
-                                            <a href="/users/edit/<%=item.userid%>" class="btn btn-success btn-circle">
-                                                <i class="fas fa-info-circle"></i>
-                                            </a>
-                                            <a href="/users/delete/<%=item.userid%>" class="btn btn-danger btn-circle"
-                                                data-toggle="modal" data-target="#deleteModal<%=index%>">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-
-                                    <!-- Delete Modal-->
-                                    <div class="modal fade" id="deleteModal<%=index%>" tabindex="-1" role="dialog"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Deleted
-                                                        Confirmation?
-                                                    </h5>
-                                                    <button class="close" type="button" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                        <span aria-hidden="true">×</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">Are you sure, you want delete it?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-secondary" type="button"
-                                                        data-dismiss="modal">No</button>
-                                                    <a class="btn btn-primary" href="/users/delete/<%=item.userid%>">
-                                                        Yes
+                                        <% rows.forEach(function (item, index) { %>
+                                            <tr>
+                                                <td>
+                                                    <%= item.userid %>
+                                                </td>
+                                                <td>
+                                                    <%= item.email %>
+                                                </td>
+                                                <td>
+                                                    <%= item.name %>
+                                                </td>
+                                                <td>
+                                                    <%= item.role %>
+                                                </td>
+                                                <td>
+                                                    <a href="/users/edit/<%=item.userid%>"
+                                                        class="btn btn-success btn-circle">
+                                                        <i class="fas fa-info-circle"></i>
                                                     </a>
+                                                    <a href="/users/delete/<%=item.userid%>"
+                                                        class="btn btn-danger btn-circle" data-toggle="modal"
+                                                        data-target="#deleteModal<%=index%>">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Delete Modal-->
+                                            <div class="modal fade" id="deleteModal<%=index%>" tabindex="-1"
+                                                role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Deleted
+                                                                Confirmation?
+                                                            </h5>
+                                                            <button class="close" type="button" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">Are you sure, you want delete it?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button"
+                                                                data-dismiss="modal">No</button>
+                                                            <a class="btn btn-primary"
+                                                                href="/users/delete/<%=item.userid%>">
+                                                                Yes
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <% }) %>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th rowspan="1" colspan="1">User ID</th>
-                                    <th rowspan="1" colspan="1">Email</th>
-                                    <th rowspan="1" colspan="1">Name</th>
-                                    <th rowspan="1" colspan="1">Role</th>
-                                    <th rowspan="1" colspan="1">Action</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-
-
-
-                        <div class="d-sm-flex justify-content-between mb-4">
+                                            <% }) %>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">User ID</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Email</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Name</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Role</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Action</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12 col-md-5">
                                 <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">
                                     Showing <%= (offset + 1) %> to <%= offset + rows.length %> of <%= totalResult %>
-                                                entries</div>
+                                                entries
+                                </div>
                             </div>
-                            <div class="col-sm-12 col-md-3">
-                                <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
-                                    <ul class="pagination">
+                            <div class="col-sm-12 col-md-7">
+                                <div class="dataTables_paginate paging_simple_numbers text-right" id="dataTable_paginate">
+                                    <ul class="pagination justify-content-end">
                                         <li class="page-item<%=page == 1 ? ' disabled' : '' %>">
                                             <a class="page-link"
                                                 href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) - 1) <= 0 ? 1 : parseInt(page-1) }` ) %>">Previous</a>
@@ -166,7 +203,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -176,5 +212,12 @@
             <!-- /.container-fluid -->
             </div>
             <!-- End of Main Content -->
+
+            <script>
+                const select = document.querySelector('select[name="display"]');
+                select.addEventListener('change', function () {
+                    this.form.submit();
+                });
+            </script>
 
             <%- include('../partials/footer.ejs') %>

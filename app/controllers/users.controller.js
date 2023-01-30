@@ -86,70 +86,82 @@ exports.dashboard = async (req, res) => {
 
 exports.users = async (req, res) => {
     try {
-        const user = req.session.user
-        const { searchValue } = req.query
+        // Ambil data user dari session
+        const user = req.session.user;
+        // Ambil data dari req.query
+        const { searchValue, display } = req.query;
 
-        const field = ['userid', 'email', 'name', 'role'];
+        // Sorting
+        const sortBy = req.query.sortBy || 'userid'
+        const sortMode = req.query.sortMode || 'asc'
 
-        const sortBy = field.includes(req.query.sortBy) ? req.query.sortBy : 'userid';
-        const sortMode = req.query.sortMode === 'desc' ? -1 : 1;
+        // URL saat ini
+        const url =
+            req.url === '/users' ||
+                req.url === `/users?searchValue=${searchValue}&display=${display}` ||
+                req.url === `/users?display=${display}`
+                ? `/users?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
+                : req.url;
 
-        const url = req.url === '/users' || req.url === `/users?searchValue=${searchValue}` ? `/users?page=1&sortBy=id&sortMode=asc&searchValue=${searchValue || ''}` : req.url;
+        // Halaman saat ini
+        let page = req.query.page || 1;
+        // Batas tampilan
+        const limit = req.query.display || 3
+        // Offset tampilan
+        const offset = page > 0 ? (page - 1) * limit : (page = 1);
 
-
-        let page = req.query.page || 1  
-        const limit = req.query.display == 'all' ? 0 : req.query.display || 3;
-        const offset = page > 0 ? (page - 1) * limit : page = 1;
-
-        const wheres = []
-        const values = []
-        //pencarian
-        if(searchValue){
+        // Kondisi pencarian
+        const wheres = [];
+        // Nilai pencarian
+        const values = [];
+        // Jika ada pencarian
+        if (searchValue) {
             wheres.push(`
-            name ilike '%' || $1 || '%' OR
-            email ilike '%' || $2 || '%'`)
-            values.push(searchValue, searchValue)
+          name ilike '%' || $1 || '%' OR
+          email ilike '%' || $2 || '%'`);
+            values.push(searchValue, searchValue);
         }
 
-        let sql = 'SELECT COUNT(*) AS total FROM users'
-
-        //kalau ada pencarian
-        if(wheres.length > 0) {
-            sql += ` WHERE ${wheres.join()}`
+        // Query untuk menghitung total halaman
+        let sql = 'SELECT COUNT(*) AS total FROM users';
+        // Jika ada pencarian
+        if (wheres.length > 0) {
+            sql += ` WHERE ${wheres.join()}`;
         }
 
-        console.log(sql)
-        console.log(wheres)
-        console.log(searchValue)
+        // Eksekusi query
+        const totalResult = await db.query(sql, values);
+        // Hitung jumlah halaman
+        const pages = Math.ceil(totalResult.rows[0].total / limit);
 
-        //total page
-        const totalResult = await db.query(sql, values)
-        const pages = Math.ceil(totalResult.rows[0].total / limit)
-
-        sql = 'SELECT * FROM users'
-
-        //kalau ada pencarian
-        if(wheres.length > 0) {
-            sql += ` WHERE ${wheres.join()}`
+        // Query untuk mengambil data
+        sql = 'SELECT * FROM users';
+        // Jika ada pencarian
+        if (wheres.length > 0) {
+            sql += ` WHERE ${wheres.join()}`;
         }
+        // Tambahkan limit, offset, sortby, dan sortmode
+        sql += ` ORDER BY ${sortBy} ${sortMode} LIMIT ${limit} OFFSET ${offset}`;
 
-        sql += ` LIMIT ${limit} OFFSET ${offset}`
+        // Eksekusi query
+        const { rows } = await db.query(sql, values);
 
-        const { rows } = await db.query(sql, values)
-
-        res.render('./users/users', { name: user.name, rows, page, pages, url, limit, offset, totalResult: totalResult.rows[0].total, infoSuccess: req.flash('infoSuccess'), searchRows: null })
-    } catch (e) {
-        res.send(e)
-    }
-}
-
-exports.searchUser = async (req, res) => {
-    try {
-        const { searchValue } = req.body
-
-        const { rows } = await db.query(`SELECT * FROM users WHERE name ilike '%' || $1 || '%'`, [searchValue])
-
-        res.send({ searchRows : rows })
+        // Render halaman
+        res.render('./users/users', {
+            name: user.name,
+            rows,
+            page,
+            pages,
+            url,
+            limit,
+            offset,
+            display,
+            sortBy,
+            sortMode,
+            totalResult: totalResult.rows[0].total,
+            infoSuccess: req.flash('infoSuccess'),
+            searchValue: searchValue || '',
+        })
     } catch (e) {
         res.send(e)
     }
@@ -217,7 +229,7 @@ exports.editUser = async (req, res) => {
         email= $2,
         role = $3
         WHERE userid = $4`,
-        [name, email, roleRadio, userid])
+            [name, email, roleRadio, userid])
 
         res.redirect('/users')
     } catch (e) {
@@ -229,9 +241,9 @@ exports.editUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
     try {
         const { userid } = req.params
-        
+
         const deleteUser = await db.query('DELETE FROM users WHERE userid = $1', [userid])
-        
+
         res.redirect('/users')
     } catch (e) {
         res.send(e)
