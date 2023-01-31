@@ -180,7 +180,6 @@ exports.addUser = async (req, res) => {
     try {
         const { email, name, password, roleRadio } = req.body
 
-        console.log(roleRadio)
         //cek email
         const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email])
         if (rows.length > 0) {
@@ -206,7 +205,6 @@ exports.getEditUser = async (req, res) => {
         const user = req.session.user
         const { userid } = req.params
         const { rows } = await db.query('SELECT * FROM users WHERE userid = $1', [userid])
-        console.log(rows)
         res.render('users/editUser.ejs', { name: user.name, item: rows[0], info: req.flash('info') })
     } catch (e) {
         res.send(e)
