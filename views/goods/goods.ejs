@@ -1,0 +1,254 @@
+<title>POS - Units</title>
+
+<%- include('../partials/header.ejs') %>
+
+    <!-- Page Heading -->
+    <div class="align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-1 text-gray-800">Users</h1>
+        <p class="text-gray-800">This is data of Users</p>
+    </div>
+
+
+    <% if(infoSuccess.length> 0) { %>
+        <div class="alert alert-success" role="alert">
+            <%= infoSuccess %>
+        </div>
+        <% } %>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+
+                    <a href="/goods/add" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50"
+                            style="display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">Add</span>
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_length">
+                                  <label class="d-flex"> Show
+                                    <form action="/goods" method="get">
+                                      <select name="display" aria-controls="dataTable" class="custom-select custom-select-sm form-control form-control-sm">
+                                        <option value="3" <%=display==3 ? 'selected' : '' %>>3</option>
+                                        <option value="10" <%=display==10 ? 'selected' : '' %>>10</option>
+                                        <option value="100" <%=display==100 ? 'selected' : '' %>>100</option>
+                                      </select> 
+                                      <input type="hidden" name="page" value="1">
+                                      <input type="hidden" name="sortBy" value="<%=sortBy%>">
+                                      <input type="hidden" name="sortMode" value="<%=sortMode%>">
+                                      <input type="hidden" name="searchValue" value="<%=searchValue%>">
+                                    </form>entries
+                                  </label>
+                                </div>
+                              </div>
+                              <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_filter">
+                                  <label class="d-flex">Search:
+                                    <form action="" method="get">
+                                      <input type="hidden" name="page" value="1">
+                                      <input type="hidden" name="sortBy" value="<%=sortBy%>">
+                                      <input type="hidden" name="sortMode" value="<%sortMode%>">
+                                      <input type="hidden" name="display" value="<%=display%>">
+                                      <input type="search" class="form-control form-control-sm" placeholder="" aria-controls="dataTable" id="search" name="searchValue" value="<%= searchValue %>">
+                                    </form>
+                                  </label>
+                                </div>
+                              </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
+                                    aria-describedby="dataTable_info">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=barcode`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'barcode' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Barcode
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=name`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'name' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Name
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=stock`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'stock' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Stock
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=unit`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'unit' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Unit
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=purchaseprice`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'purchaseprice' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Purchase Price
+                                                </a>
+                                            </th>
+                                            <th>
+                                                <a class="text-gray-800 text-decoration-none"
+                                                    href="<%= url.replace(`sortBy=${sortBy}`, `sortBy=sellingprice`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`)%>">
+                                                    <i
+                                                        class="fas fa-<%= sortBy == 'sellingprice' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort'%>"></i>
+                                                    Selling Price
+                                                </a>
+                                            </th>
+                                            <th class="text-gray-800">
+                                                Picture
+                                            </th>
+                                            <th class="text-gray-800">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <% rows.forEach(function (item, index) { %>
+                                            <tr>
+                                                <td>
+                                                    <%= item.barcode %>
+                                                </td>
+                                                <td>
+                                                    <%= item.name %>
+                                                </td>
+                                                <td>
+                                                    <%= item.stock %>
+                                                </td>
+                                                <td>
+                                                    <%= item.unit %>
+                                                </td>
+                                                <td>
+                                                    <%= IDRupiah.format(item.purchaseprice) %>
+                                                </td>
+                                                <td>
+                                                    <%= IDRupiah.format(item.sellingprice) %>
+                                                </td>
+                                                <td>
+                                                    <%= item.picture %>
+                                                </td>
+                                                <td>
+                                                    <a href="/goods/edit/<%=item.barcode%>"
+                                                        class="btn btn-success btn-circle">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </a>
+                                                    <a href="/goods/delete/<%=item.barcode%>"
+                                                        class="btn btn-danger btn-circle" data-toggle="modal"
+                                                        data-target="#deleteModal<%=index%>">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Delete Modal-->
+                                            <div class="modal fade" id="deleteModal<%=index%>" tabindex="-1"
+                                                role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Deleted
+                                                                Confirmation?
+                                                            </h5>
+                                                            <button class="close" type="button" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">Are you sure, you want delete it?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button"
+                                                                data-dismiss="modal">No</button>
+                                                            <a class="btn btn-primary"
+                                                                href="/goods/delete/<%=item.barcode%>">
+                                                                Yes
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <% }) %>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Barcode</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Name</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Stock</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Unit</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Purchase Price</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Selling Price</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Picture</th>
+                                            <th rowspan="1" colspan="1" class="text-gray-800">Action</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">
+                                    Showing <%= (offset + 1) %> to <%= offset + rows.length %> of <%= totalResult %>
+                                                entries
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-7">
+                                <div class="dataTables_paginate paging_simple_numbers text-right" id="dataTable_paginate">
+                                    <ul class="pagination justify-content-end">
+                                        <li class="page-item<%=page == 1 ? ' disabled' : '' %>">
+                                            <a class="page-link"
+                                                href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) - 1) <= 0 ? 1 : parseInt(page-1) }` ) %>">Previous</a>
+                                        </li>
+                                        <% for( let i=1; i <=pages; i++ ) { %>
+                                            <li class="page-item<%=page==i ? ' active' : '' %>"><a class="page-link"
+                                                    href="<%= url.replace(`page=${page}`, `page=${i}`)%>">
+                                                    <%= i %>
+                                                </a></li>
+                                            <% } %>
+                                                <li class="page-item<%=page == pages ? ' disabled' : '' %>">
+                                                    <a class="page-link"
+                                                        href="<%= url.replace(`page=${page}`, `page=${(parseInt(page) + 1) > pages ? pages : parseInt(page)+1 }` ) %>">Next</a>
+                                                </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            </div>
+            <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
+
+            <script>
+                const select = document.querySelector('select[name="display"]');
+                select.addEventListener('change', function () {
+                    this.form.submit();
+                });
+            </script>
+
+            <%- include('../partials/footer.ejs') %>

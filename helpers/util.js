@@ -10,5 +10,10 @@ module.exports = {
             res.send(error)
         }
 
-    }
+    },
+
+    IDRupiah: new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+    })
 }
