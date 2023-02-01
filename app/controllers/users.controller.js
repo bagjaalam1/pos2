@@ -97,7 +97,7 @@ exports.users = async (req, res) => {
 
         // URL saat ini
         const url =
-            req.url === '/users' ||
+            req.url === '/users/' ||
                 req.url === `/users?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/users?display=${display}`
                 ? `/users?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`

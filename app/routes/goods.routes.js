@@ -7,6 +7,8 @@ module.exports = (app) => {
     router.get('/goods', isLoggedIn, controller.getGoods)
     router.get('/goods/add', isLoggedIn, controller.getAddGood)
     router.post('/goods/add', isLoggedIn, controller.addGood)
+    router.get('/goods/edit/:barcode', isLoggedIn, controller.getEditGoods)
+    router.post('/goods/edit/:barcode', isLoggedIn, controller.editGoods)
 
     app.use('/', router)
     return router;

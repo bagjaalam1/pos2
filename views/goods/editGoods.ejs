@@ -4,7 +4,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Form Add</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Form Edit</h6>
         </div>
 
 
@@ -13,40 +13,40 @@
                 <div class="row mb-3">
                     <label for="input1" class="col-sm-2 col-form-label">Barcode</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input1" name="barcode">
+                        <input type="text" class="form-control" id="input1" name="barcode" value="<%=item.barcode%>" disabled>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input2" class="col-sm-2 col-form-label">Name</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input2" name="name">
+                        <input type="text" class="form-control" id="input2" name="name" value="<%=item.name%>">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Stock</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input3" name="stock">
+                        <input type="text" class="form-control" id="input3" name="stock" value="<%=item.stock%>">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Purchase Price</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input3" name="purchaseprice" placeholder="0">
+                        <input type="text" class="form-control" id="input3" name="purchaseprice" placeholder="0" value="<%=item.purchaseprice%>">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Selling Price</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input3" name="sellingprice" placeholder="0">
+                        <input type="text" class="form-control" id="input3" name="sellingprice" placeholder="0" value="<%=item.sellingprice%>">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Unit</label>
                     <div class="col-sm-10">
                         <select name="unit" class="custom-select custom-select-sm form-control form-control-sm">
-                            <% for (var i=0; i < rows.length; i++) { %>
-                                <option value="<%=rows[i].unit%>">
-                                    <%=rows[i].unit%>
+                            <% for (var i=0; i < unitData.length; i++) { %>
+                                <option value="<%=unitData[i].unit%>" <%= unitData[i].unit == item.unit ? 'selected' : '' %>>
+                                    <%=unitData[i].unit%>
                                 </option>
                                 <% } %>
                         </select>
@@ -61,7 +61,7 @@
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Preview</label>
                     <div class="col-sm-10">
-                        <img src="" alt="" id="preview-gambar" width="200" height="200">
+                        <img src="/img/goodsImagesSaved/<%=item.picture%>" alt="" id="preview-gambar" width="200" height="200">
                     </div>
                 </div>
             </div>

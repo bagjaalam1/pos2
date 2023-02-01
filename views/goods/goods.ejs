@@ -4,8 +4,7 @@
 
     <!-- Page Heading -->
     <div class="align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-1 text-gray-800">Users</h1>
-        <p class="text-gray-800">This is data of Users</p>
+        <h1 class="h3 mb-1 text-gray-800">Goods</h1>
     </div>
 
 
@@ -146,7 +145,7 @@
                                                     <%= IDRupiah.format(item.sellingprice) %>
                                                 </td>
                                                 <td>
-                                                    <%= item.picture %>
+                                                    <img src="/img/goodsImagesSaved/<%=item.picture%>" alt="" width="100" height="100">
                                                 </td>
                                                 <td>
                                                     <a href="/goods/edit/<%=item.barcode%>"
@@ -243,6 +242,7 @@
             <!-- /.container-fluid -->
             </div>
             <!-- End of Main Content -->
+            <img src="/img/goodsImagesSaved/baju_1_2_3_4.png" alt="" width="100" height="100">
 
             <script>
                 const select = document.querySelector('select[name="display"]');

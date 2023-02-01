@@ -14,7 +14,7 @@ exports.getUnits = async (req, res) => {
 
         // URL saat ini
         const url =
-            req.url === '/units' ||
+            req.url === '/units/' ||
                 req.url === `/units?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/units?display=${display}`
                 ? `/units?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -128,11 +128,6 @@ exports.editUnit = async (req, res) => {
     try {
         const { unitValue, name, note } = req.body
         const { unit } = req.params
-
-        console.log(unitValue)
-        console.log(name)
-        console.log(note)
-        console.log(unit)
 
         //cek unit
         const { rows } = await db.query('SELECT * FROM units WHERE unit = $1', [unitValue])
