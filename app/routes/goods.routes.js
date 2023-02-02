@@ -9,6 +9,7 @@ module.exports = (app) => {
     router.post('/goods/add', isLoggedIn, controller.addGood)
     router.get('/goods/edit/:barcode', isLoggedIn, controller.getEditGoods)
     router.post('/goods/edit/:barcode', isLoggedIn, controller.editGoods)
+    router.get('/goods/delete/:barcode', isLoggedIn, controller.deleteGoods)
 
     app.use('/', router)
     return router;

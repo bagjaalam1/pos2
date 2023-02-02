@@ -1,4 +1,4 @@
-<title> POS - Units </title>
+<title> POS - Goods </title>
 
 <%- include('../partials/header.ejs') %>
 
@@ -19,25 +19,25 @@
                 <div class="row mb-3">
                     <label for="input2" class="col-sm-2 col-form-label">Name</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input2" name="name" value="<%=item.name%>">
+                        <input type="text" class="form-control" id="input2" name="name" value="<%=item.name%>" required>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Stock</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input3" name="stock" value="<%=item.stock%>">
+                        <input type="text" class="form-control" id="input3" name="stock" value="<%=item.stock%>" required>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Purchase Price</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input3" name="purchaseprice" placeholder="0" value="<%=item.purchaseprice%>">
+                        <input type="text" class="form-control" id="input3" name="purchaseprice" placeholder="0" value="<%=item.purchaseprice%>" required>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Selling Price</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input3" name="sellingprice" placeholder="0" value="<%=item.sellingprice%>">
+                        <input type="text" class="form-control" id="input3" name="sellingprice" placeholder="0" value="<%=item.sellingprice%>" required>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -55,7 +55,7 @@
                     <div class="row mb-3">
                         <label for="gambar-input" class="col-sm-2 col-form-label">Picture</label>
                         <div class="col-sm-10 custom-file">
-                            <input type="file" class="form-control" id="gambar-input" name="picture">
+                            <input type="file" class="form-control" id="gambar-input" name="picture" value="<%=item.picture%>">
                         </div>
                     </div>
                 <div class="row mb-3">

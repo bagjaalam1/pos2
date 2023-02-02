@@ -1,6 +1,8 @@
 const db = require('../models/index')
 const { IDRupiah } = require('../../helpers/util')
 const path = require('path')
+const fs = require('fs')
+const { get } = require('http')
 
 exports.getGoods = async (req, res) => {
     try {
@@ -139,7 +141,7 @@ exports.addGood = async (req, res) => {
             while (true) {
                 const { rows } = await db.query("SELECT name FROM goods WHERE picture = $1", [uniquePictureName]);
 
-                if (rows.length === 0) {
+                if (rows.length == 0) {
                     break;
                 }
                 let splitPictureName = uniquePictureName.split(".");
@@ -193,60 +195,101 @@ exports.editGoods = async (req, res) => {
         const { name, stock, purchaseprice, sellingprice, unit } = req.body
         const { barcode } = req.params
 
-        // Ambil Data Gambar
-        let picture = req.files.picture
-        let pictureName = picture.name
+        if (req.files) {
 
-        // Validasi ekstensi file
-        let allowedExtension = ['image/jpeg', 'image/jpg', 'image/png']
-        if (allowedExtension.indexOf(picture.mimetype) === -1) {
-            throw 'Hanya file JPEG atau PNG yang diperbolehkan'
-        }
+            // Ambil Data Gambar
+            let picture = req.files.picture
+            let pictureName = picture.name
 
-        // Validasi ukuran file
-        if (picture.size > 2 * 1024 * 1024) {
-            throw 'Ukuran file tidak boleh lebih dari 2 MB'
-        }
-
-        // Validasi Nama File
-        async function generateUniquePictureName(pictureName) {
-            let uniquePictureName = pictureName;
-            let counter = 1;
-
-            while (true) {
-                const { rows } = await db.query("SELECT picture FROM goods WHERE picture = $1", [uniquePictureName]);
-
-                if (rows.length === 0) {
-                    break;
-                }
-                let splitPictureName = uniquePictureName.split(".");
-                let extension = splitPictureName.pop();
-                let name = splitPictureName.join("");
-                uniquePictureName = `${name} (${counter}).${extension}`;
+            // Validasi ekstensi file
+            let allowedExtension = ['image/jpeg', 'image/jpg', 'image/png']
+            if (allowedExtension.indexOf(picture.mimetype) === -1) {
+                throw 'Hanya file JPEG atau PNG yang diperbolehkan'
             }
-            return uniquePictureName;
+
+            // Validasi ukuran file
+            if (picture.size > 2 * 1024 * 1024) {
+                throw 'Ukuran file tidak boleh lebih dari 2 MB'
+            }
+
+            // Validasi Nama File
+            async function generateUniquePictureName(pictureName) {
+                let uniquePictureName = pictureName;
+                let counter = 1;
+
+                while (true) {
+                    const { rows } = await db.query("SELECT picture FROM goods WHERE picture = $1", [uniquePictureName]);
+
+                    if (rows.length == 0) {
+                        break;
+                    }
+                    let splitPictureName = uniquePictureName.split(".");
+                    let extension = splitPictureName.pop();
+                    let name = splitPictureName.join("");
+                    uniquePictureName = `${name} (${counter}).${extension}`;
+                }
+                return uniquePictureName;
+            }
+            let uniquePictureName = await generateUniquePictureName(pictureName);
+
+            // Save File Gambar ke Lokal
+            const publicImagesPath = path.join(__dirname, '..', '..', 'public', 'img', 'goodsImagesSaved', `${uniquePictureName}`);
+            const saveImage = await picture.mv(publicImagesPath)
+
+            const editGoods = await db.query(`UPDATE goods SET 
+                barcode = $1,
+                name = $2,
+                stock = $3,
+                purchaseprice = $4,
+                sellingprice = $5,
+                unit = $6,
+                picture = $7
+                WHERE barcode = $8`,
+                [barcode, name, stock, purchaseprice, sellingprice, unit, uniquePictureName, barcode])
+        } else if (!req.files) {
+            const { rows } = await db.query("SELECT picture FROM goods WHERE barcode = $1", [barcode])
+            const namePictureData = rows[0].picture
+            console.log(namePictureData)
+            const editGoods = await db.query(`UPDATE goods SET 
+                barcode = $1,
+                name = $2,
+                stock = $3,
+                purchaseprice = $4,
+                sellingprice = $5,
+                unit = $6,
+                picture = $7
+                WHERE barcode = $8`,
+                [barcode, name, stock, purchaseprice, sellingprice, unit, namePictureData, barcode])
         }
-        let uniquePictureName = await generateUniquePictureName(pictureName);
-
-        // Save File Gambar ke Lokal
-        const publicImagesPath = path.join(__dirname, '..', '..', 'public', 'img', 'goodsImagesSaved', `${uniquePictureName}`);
-        const saveImage = await picture.mv(publicImagesPath)
-
-        const editGoods = await db.query(`UPDATE goods SET 
-        barcode = $1,
-        name = $2,
-        stock = $3,
-        purchaseprice = $4,
-        sellingprice = $5,
-        unit = $6,
-        picture = $7
-        WHERE barcode = $8`,
-            [barcode, name, stock, purchaseprice, sellingprice, unit, uniquePictureName, barcode])
 
         res.redirect('/goods')
     } catch (e) {
         res.send(e)
         // req.flash('info', e)
         // res.redirect(`/goods/edit/${req.params.barcode}`)
+    }
+}
+
+exports.deleteGoods = async (req, res) => {
+    try {
+        const { barcode } = req.params
+
+        // Ambil Data Nama File
+        const { rows } = await db.query('SELECT picture FROM goods WHERE barcode = $1', [barcode])
+        const namePicture = rows[0].picture
+
+        const publicImagesPath = path.join(__dirname, '..', '..', 'public', 'img', 'goodsImagesSaved', `${namePicture}`)
+        fs.unlink(publicImagesPath, (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+        });
+        const deleteGoods = await db.query('DELETE FROM goods WHERE barcode = $1', [barcode])
+
+        res.redirect('/goods')
+    } catch (e) {
+        console.error(e);
+        res.send('Terjadi error. Proses penghapusan barang dan file gambar dibatalkan.');
     }
 }
