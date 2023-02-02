@@ -278,6 +278,10 @@ exports.deleteGoods = async (req, res) => {
         const { rows } = await db.query('SELECT picture FROM goods WHERE barcode = $1', [barcode])
         const namePicture = rows[0].picture
 
+        // Hapus Data dari Database
+        const deleteGoods = await db.query('DELETE FROM goods WHERE barcode = $1', [barcode])
+
+        // Hapus Data dari direktori
         const publicImagesPath = path.join(__dirname, '..', '..', 'public', 'img', 'goodsImagesSaved', `${namePicture}`)
         fs.unlink(publicImagesPath, (err) => {
             if (err) {
@@ -285,7 +289,6 @@ exports.deleteGoods = async (req, res) => {
                 return;
             }
         });
-        const deleteGoods = await db.query('DELETE FROM goods WHERE barcode = $1', [barcode])
 
         res.redirect('/goods')
     } catch (e) {
