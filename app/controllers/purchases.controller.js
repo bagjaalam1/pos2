@@ -97,3 +97,14 @@ exports.getPurchases = async (req, res) => {
     }
 
 }
+
+exports.postPurchases = async (req, res) => {
+    const operator = req.session.user.userid
+    const insert = await db.query('INSERT INTO purchases(totalsum, operator) VALUES($1, $2)', ['0', operator])
+    res.redirect('/purchases/add')
+}
+
+exports.getAddPurchases = async(req, res) => {
+    const { user } = req.session
+    res.json({name: user.name})
+}

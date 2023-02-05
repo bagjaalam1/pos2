@@ -1,0 +1,162 @@
+<title> POS - Purchases </title>
+
+<%- include('../partials/header_for_jquery.html') %>
+
+    <title>POS - Suppliers</title>
+
+    <!-- Page Heading -->
+    <div class="align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-1 text-gray-800">Purchases</h1>
+    </div>
+
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h1>Transaction</h1>
+        </div>
+
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Invoice</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="name@example.com">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Time</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Optional">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Operator</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Optional">
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <hr>
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Goods Barcode</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="name@example.com">
+                        </fieldset>
+                        <br>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Goods Name</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Optional">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Stock</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Optional">
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Purchase Price</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="name@example.com">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Qty</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Optional">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Total Price</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Optional">
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+
+            <a href="/purchases/add" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="text">Add</span>
+            </a>
+        </div>
+        <hr>
+        <table class="table table-striped " width="100%" cellspacing="0" role="grid">
+            <thead>
+                <tr>
+                    <th>
+                        No
+                    </th>
+                    <th>
+                        Barcode
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Qty
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Total Price
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div class="card-footer">
+            <form action="">
+                <div class="form-group row">
+                    <label for="inputName" class="col-sm-2 col-form-label">Total Summary</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputName" placeholder="Nama">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputName" class="col-sm-2 col-form-label">Supplier</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputName" placeholder="Nama">
+                    </div>
+                </div>
+            </form>
+            <button type="submit" class="btn btn-success btn-icon-split">
+                <span class="icon text-white-50"
+                    style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus"></i>
+                </span> 
+                <span class="text">Finish</span>
+            </button>
+
+            <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
+                <span class="icon text-white-50"
+                    style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fa fa-undo" aria-hidden="true"></i>
+                </span>
+                <span class="text">Back</span>
+            </a>
+        </div>
+    </div>
+
+
+    </div>
+    <!-- /.container-fluid -->
+    </div>
+    <!-- End of Main Content -->
+
+    <%- include('../partials/footer.ejs') %>

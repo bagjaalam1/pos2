@@ -5,6 +5,8 @@ module.exports = (app) => {
     const controller = require('../controllers/purchases.controller')
 
     router.get('/purchases', isLoggedIn, controller.getPurchases)
+    router.post('/purchases', isLoggedIn, controller.postPurchases)
+    router.get('/purchases/add', isLoggedIn, controller.getAddPurchases)
 
     app.use('/', router)
     return router;
