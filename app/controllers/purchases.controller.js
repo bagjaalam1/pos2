@@ -68,8 +68,10 @@ exports.getPurchases = async (req, res) => {
         // Tambahkan limit, offset, sortby, dan sortmode
         sql += ` ORDER BY ${sortBy} ${sortMode} LIMIT ${limit} OFFSET ${offset}`;
 
+        console.log(sql)
         // Eksekusi query
         const { rows } = await db.query(sql, values);
+        console.log(rows)
 
         // Render halaman
         res.render('./purchases/purchases', {
@@ -104,7 +106,36 @@ exports.postPurchases = async (req, res) => {
     res.redirect('/purchases/add')
 }
 
+exports.getAPIAddPurchases = async(req, res) => {
+    const operator = req.session.user
+
+    // Ambil Data Goods
+    async function getGoodsData() {
+        const { rows } = await db.query('SELECT * FROM goods')
+        const goodsData = rows
+        return goodsData
+    }
+    const goodsData = await getGoodsData()
+
+    // ambil data purchases
+    async function getPurchasesData() {
+        const { rows } = await db.query('SELECT * FROM purchases ORDER BY time ASC')
+        const purchasesData = rows.pop()
+        return purchasesData
+    }
+    const purchasesData = await getPurchasesData()
+
+    res.json({purchasesData, operator, goodsData})
+}
+
+exports.putAPIAddPurchases = async (req, res) => {
+    const { barcode, quantity, purchasePriceNumber, totalPriceNumber, invoice } = req.body
+    console.log(invoice, barcode, quantity, purchasePriceNumber, totalPriceNumber)
+
+    const addPurchaseitems = await db.query('INSERT INTO purchaseitems(invoice, itemcode, quantity, purchaseprice, totalprice) VALUES ($1, $2, $3, $4, $5)', [invoice, barcode, quantity, purchasePriceNumber, totalPriceNumber])
+}
+
 exports.getAddPurchases = async(req, res) => {
     const { user } = req.session
-    res.json({name: user.name})
+    res.render('./purchases/purchasesAdd', {name: user.name})
 }

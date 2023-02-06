@@ -1,0 +1,273 @@
+<title> POS - Purchases </title>
+<%- include('../partials/header.ejs') %>
+    <!-- Page Heading -->
+    <div class="align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-1 text-gray-800">Purchases</h1>
+    </div>
+
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h1>Transaction</h1>
+        </div>
+
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Invoice</label>
+                            <input type="text" id="invoice" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
+                                disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Time</label>
+                            <input type="text" id="time" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="Optional" disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Operator</label>
+                            <input type="text" id="operator" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="Optional" disabled>
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <hr>
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Goods Barcode</label>
+                            <select name="barcode" class="form-control mb-2 mr-sm-2 mb-sm-0" id="barcode">
+
+                            </select>
+                        </fieldset>
+                        <br>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Goods Name</label>
+                            <input type="text" id="goods_name" name="name" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Stock</label>
+                            <input type="text" name="stock" id="stock" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
+                                disabled>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Purchase Price</label>
+                            <input type="text" id="purchaseprice" name="purchaseprice"
+                                class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Qty</label>
+                            <input type="number" id="quantity" name="quantity" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Total Price</label>
+                            <input type="text" id="totalprice" name="totalprice"
+                                class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+            <br>
+            <button id="add" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="text">Add</span>
+            </button>
+        </div>
+        <hr>
+        <table class="table table-striped " width="100%" cellspacing="0" role="grid">
+            <thead>
+                <tr>
+                    <th>
+                        No
+                    </th>
+                    <th>
+                        Barcode
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Qty
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Total Price
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div class="card-footer">
+            <form action="">
+                <div class="form-group row">
+                    <label for="inputName" class="col-sm-2 col-form-label">Total Summary</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputName" placeholder="Nama">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputName" class="col-sm-2 col-form-label">Supplier</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputName" placeholder="Nama">
+                    </div>
+                </div>
+            </form>
+            <button type="submit" class="btn btn-success btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="text">Finish</span>
+            </button>
+
+            <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fa fa-undo" aria-hidden="true"></i>
+                </span>
+                <span class="text">Back</span>
+            </a>
+        </div>
+    </div>
+
+
+    </div>
+    <!-- /.container-fluid -->
+    </div>
+    <!-- End of Main Content -->
+
+    <script>
+        moment.locale("id")
+
+        function formatRupiah(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
+
+        $(document).ready(function () {
+            // Ambil Data Purchase
+            $.ajax({
+                url: "http://localhost:3000/api/purchases/add",
+                method: "GET",
+                success: function (response) {
+                    // value input purchase
+                    $('#invoice').val(response.purchasesData.invoice)
+                    const time = response.purchasesData.time
+                    $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
+                    $('#operator').val(response.operator.name)
+
+                    // Value Input Goods
+                    response.goodsData.forEach(function (item) {
+                        $('#barcode').append($('<option>', {
+                            value: item.barcode,
+                            text: item.barcode + ' - ' + item.name,
+                        }));
+                    });
+
+                    $('#barcode').prepend($('<option>', {
+                        value: '',
+                        text: 'Select Goods',
+                        selected: true,
+                        disabled: true
+                    })).on('change', function () {
+                        // Cari item dengan barcode yang dipilih
+                        var selectedItem = response.goodsData.find(function (item) {
+                            return item.barcode === this.value;
+                        }, this);
+
+                        // Tampilkan data dalam input value lain
+                        if (selectedItem) {
+                            $('#goods_name').val(selectedItem.name);
+                            $('#stock').val(selectedItem.stock);
+                            const purchasePriceNumber = selectedItem.purchaseprice * 1
+                            $('#purchaseprice').val(formatRupiah(purchasePriceNumber.toString(), "Rp. "));
+                            $('#quantity').val('')
+                            $('#totalprice').val('')
+                        } else {
+                            $('#goods_name').val('');
+                            $('#stock').val('')
+                            $('#purchaseprice').val('');
+                        }
+
+                        $('#quantity').on('keyup', function () {
+                            var quantity = this.value;
+                            var purchaseprice = selectedItem.purchaseprice;
+
+                            if (!isNaN(quantity) && !isNaN(purchaseprice)) {
+                                const hasilKali = quantity * purchaseprice
+                                $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
+                            } else {
+                                $('#totalprice').val('');
+                            }
+                        });
+                    });
+                }
+            });
+
+            $("#add").click(function (event) {
+                event.preventDefault();
+                const barcode = $("#barcode").val();
+                const purchaseprice = $('#purchaseprice').val()
+                const purchasePriceNumber = parseInt(purchaseprice.replace(/[^0-9]/g, ''));
+                const totalprice = $('#totalprice').val()
+                const totalPriceNumber = parseInt(totalprice.replace(/[^0-9]/g, '')); 
+                const invoice = $('#invoice').val()
+                const quantity = $('#quantity').val()
+                console.log(barcode, purchasePriceNumber, totalPriceNumber, quantity)
+
+                let params = {barcode, purchasePriceNumber, totalPriceNumber, invoice, quantity}
+
+                // Mengirim data menggunakan ajax
+                $.ajax({
+                    url: "http://localhost:3000/api/purchases/add",
+                    type: "put",
+                    data: params,
+                    success: function (data) {
+                        // Menampilkan data dari controller
+                        
+                    }
+                });
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer.ejs') %>
