@@ -6,6 +6,7 @@ module.exports = (app) => {
 
     router.get('/purchases/add', isLoggedIn, controller.getAPIAddPurchases)
     router.put('/purchases/add', isLoggedIn, controller.putAPIAddPurchases)
+    router.post('/purchases/add', isLoggedIn, controller.postAPIAddPurchases)
 
     app.use('/api', router)
     return router;

@@ -1,3 +1,4 @@
+--buat default invoice
 CREATE OR REPLACE FUNCTION set_invoice_number()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -15,3 +16,53 @@ CREATE TRIGGER set_invoice_number_trigger
 BEFORE INSERT ON purchases
 FOR EACH ROW
 EXECUTE FUNCTION set_invoice_number();
+
+--
+
+--buat totalsum
+CREATE OR REPLACE FUNCTION update_purchase_total_sum()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE purchases
+    SET totalsum = totalsum + NEW.totalprice
+    WHERE invoice = NEW.invoice;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_purchase_total_sum_trigger
+AFTER INSERT ON purchaseitems
+FOR EACH ROW
+EXECUTE FUNCTION update_purchase_total_sum();
+
+--
+
+--reset invoice seq ketika berganti hari
+CREATE OR REPLACE FUNCTION reset_invoice_number()
+RETURNS TRIGGER AS $$
+BEGIN 
+  IF (date_part('day', NOW()) != date_part('day', OLD.invoice_date)) THEN
+    ALTER SEQUENCE no_urut RESTART WITH 1;
+  END IF;
+  NEW.invoice := 'INV-' || to_char(NOW(), 'YYYYMMDD') || '-' || nextval('no_urut');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+--update stock table goods kalau beli
+CREATE OR REPLACE FUNCTION update_goods_stock()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE goods
+  SET stock = stock + NEW.quantity
+  WHERE barcode = NEW.itemcode;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_goods_stock_trigger
+AFTER INSERT ON purchaseitems
+FOR EACH ROW
+EXECUTE FUNCTION update_goods_stock();

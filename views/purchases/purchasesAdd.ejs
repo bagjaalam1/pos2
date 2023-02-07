@@ -61,8 +61,8 @@
                     <div class="col-sm-4">
                         <fieldset>
                             <label>Stock</label>
-                            <input type="text" name="stock" id="stock" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
-                                disabled>
+                            <input type="text" name="stock" id="stock" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="" disabled>
                         </fieldset>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                         <fieldset>
                             <label>Qty</label>
                             <input type="number" id="quantity" name="quantity" class="form-control mb-2 mr-sm-2 mb-sm-0"
-                                placeholder="">
+                                placeholder="" required>
                         </fieldset>
                     </div>
                     <div class="col-sm-4">
@@ -122,26 +122,27 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="purchaseitemsTableBody">
 
             </tbody>
         </table>
         <div class="card-footer">
             <form action="">
                 <div class="form-group row">
-                    <label for="inputName" class="col-sm-2 col-form-label">Total Summary</label>
+                    <label for="totalsumInput" class="col-sm-2 col-form-label">Total Summary</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="inputName" placeholder="Nama">
+                        <input type="text" class="form-control" id="totalsumInput" placeholder="Nama" disabled>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputName" class="col-sm-2 col-form-label">Supplier</label>
+                    <label for="select_supplier" class="col-sm-2 col-form-label">Supplier</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="inputName" placeholder="Nama">
+                        <select class="form-control" id="select_supplier" placeholder="Nama" name="nameSupplier">
+                        </select>
                     </div>
                 </div>
             </form>
-            <button type="submit" class="btn btn-success btn-icon-split">
+            <button type="submit" id="finish" class="btn btn-success btn-icon-split">
                 <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-plus"></i>
                 </span>
@@ -166,6 +167,52 @@
     <script>
         moment.locale("id")
 
+        function readDataPurchaseitems() {
+
+            $.ajax({
+                url: "http://localhost:3000/api/purchases/add",
+                method: "GET",
+                success: function (response) {
+                    $('#purchaseitemsTableBody').empty();
+                    const purchaseitems = response.purchaseitems;
+                    for (let i = 0; i < purchaseitems.length; i++) {
+                        const itemcode = purchaseitems[i].itemcode;
+                        const name = purchaseitems[i].name;
+                        const quantity = purchaseitems[i].quantity;
+                        const purchaseprice = purchaseitems[i].purchaseprice;
+                        const toFormatPP = purchaseprice * 1
+                        const totalprice = purchaseitems[i].totalprice;
+                        const toFormatTP = totalprice * 1
+                        $('#purchaseitemsTableBody').append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${itemcode}</td>
+                            <td>${name}</td>
+                            <td>${quantity}</td>
+                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
+                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                        </tr>
+                        `);
+                    }
+                }
+            });
+        }
+
+        function postSuppliersData(data) {
+            $("#finish").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:3000/api/purchases/add",
+                    data: { data },
+                    success: function () {
+                        window.location.href = '/purchases'
+                    }
+                });
+            });
+        }
+
+        //catatan: agar tidak terjadi bug, kalikan 1 pada angka untuk memastikan tidak ada scale di belakang angka
+        //kemudian ubah menjadi string
         function formatRupiah(angka, prefix) {
             var number_string = angka.replace(/[^,\d]/g, '').toString(),
                 split = number_string.split(','),
@@ -183,17 +230,28 @@
             return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
         }
 
+        function pemecahRupiah(angka) {
+            const terpecah = parseInt(angka.replace(/[^0-9]/g, ''))
+            return terpecah
+        }
+
         $(document).ready(function () {
-            // Ambil Data Purchase
+
+            // Tampilkan table purchaseitems
+            readDataPurchaseitems()
+
+            // Ambil Data Purchases dan purchaseitems
             $.ajax({
                 url: "http://localhost:3000/api/purchases/add",
                 method: "GET",
                 success: function (response) {
                     // value input purchase
-                    $('#invoice').val(response.purchasesData.invoice)
-                    const time = response.purchasesData.time
+                    const { invoice, time, totalsum } = response.purchasesData
+                    $('#invoice').val(invoice)
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
+                    const formattedTS = totalsum * 1
+                    $('#totalsumInput').val(formatRupiah(formattedTS.toString(), "Rp. "))
 
                     // Value Input Goods
                     response.goodsData.forEach(function (item) {
@@ -228,6 +286,7 @@
                             $('#purchaseprice').val('');
                         }
 
+                        // perkalian quantity otomatis 
                         $('#quantity').on('keyup', function () {
                             var quantity = this.value;
                             var purchaseprice = selectedItem.purchaseprice;
@@ -240,32 +299,89 @@
                             }
                         });
                     });
+
+                    // Tampilkan Select Option Suppliers
+                    const suppliersData = response.suppliersData
+                    suppliersData.forEach(function (item) {
+                        $('#select_supplier').append($('<option>', {
+                            value: item.supplierid,
+                            text: item.name,
+                        }));
+                    });
+
+                    $('#select_supplier').prepend($('<option>', {
+                        value: '',
+                        text: 'Select Supplier',
+                        selected: true,
+                        disabled: true
+                    }))
                 }
+            });
+
+            // kirimkan Data Supplier ke Controller
+            $("#finish").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:3000/api/purchases/add",
+                    data: {
+                        supplierid: $('#select_supplier').val(),
+                        invoice: $('#invoice').val()
+                    },
+                    success: function () {
+                        window.location.href = '/purchases'
+                    }
+                });
             });
 
             $("#add").click(function (event) {
                 event.preventDefault();
                 const barcode = $("#barcode").val();
                 const purchaseprice = $('#purchaseprice').val()
-                const purchasePriceNumber = parseInt(purchaseprice.replace(/[^0-9]/g, ''));
+                const purchasePriceNumber = pemecahRupiah(purchaseprice);
                 const totalprice = $('#totalprice').val()
-                const totalPriceNumber = parseInt(totalprice.replace(/[^0-9]/g, '')); 
+                const totalPriceNumber = pemecahRupiah(totalprice);
                 const invoice = $('#invoice').val()
                 const quantity = $('#quantity').val()
                 console.log(barcode, purchasePriceNumber, totalPriceNumber, quantity)
 
-                let params = {barcode, purchasePriceNumber, totalPriceNumber, invoice, quantity}
+                let params = { barcode, purchasePriceNumber, totalPriceNumber, invoice, quantity }
 
-                // Mengirim data menggunakan ajax
-                $.ajax({
-                    url: "http://localhost:3000/api/purchases/add",
-                    type: "put",
-                    data: params,
-                    success: function (data) {
-                        // Menampilkan data dari controller
-                        
-                    }
-                });
+                if (!barcode || !purchasePriceNumber || !totalPriceNumber || !invoice || !quantity) {
+                    // do nothing. biar ga error aja
+                } else {
+                    // Mengirim data menggunakan ajax
+                    $.ajax({
+                        url: "http://localhost:3000/api/purchases/add",
+                        type: "put",
+                        data: params,
+                        success: function (response) {
+                            $('#purchaseitemsTableBody').empty();
+                            const purchaseitems = response.purchaseitems;
+                            for (let i = 0; i < purchaseitems.length; i++) {
+                                const itemcode = purchaseitems[i].itemcode;
+                                const name = purchaseitems[i].name;
+                                const quantity = purchaseitems[i].quantity;
+                                const purchaseprice = purchaseitems[i].purchaseprice;
+                                const toFormatPP = purchaseprice * 1
+                                const totalprice = purchaseitems[i].totalprice;
+                                const toFormatTP = totalprice * 1
+                                $('#purchaseitemsTableBody').append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${itemcode}</td>
+                            <td>${name}</td>
+                            <td>${quantity}</td>
+                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
+                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                        </tr>
+                        `);
+                            }
+
+                            const totalsum = response.totalsum * 1
+                            $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
+                        }
+                    });
+                }
             });
         });
     </script>

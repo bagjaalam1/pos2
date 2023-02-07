@@ -16,6 +16,7 @@ exports.getPurchases = async (req, res) => {
 
         // URL saat ini
         const url =
+            req.url === '/purchases/' ||
             req.url === '/purchases' ||
                 req.url === `/purchases?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/purchases?display=${display}`
@@ -52,12 +53,9 @@ exports.getPurchases = async (req, res) => {
 
         // Eksekusi query
         const totalResult = await db.query(sql, values);
-        console.log(sql)
-        console.log(values)
+        
         // Hitung jumlah halaman
         const pages = Math.ceil(totalResult.rows[0].total / limit);
-        console.log(totalResult)
-        console.log(pages)
 
         // Query untuk mengambil data
         sql = 'SELECT purchases.invoice, purchases.time, purchases.totalsum, suppliers.name FROM purchases INNER JOIN suppliers ON purchases.supplier = suppliers.supplierid';
@@ -68,10 +66,8 @@ exports.getPurchases = async (req, res) => {
         // Tambahkan limit, offset, sortby, dan sortmode
         sql += ` ORDER BY ${sortBy} ${sortMode} LIMIT ${limit} OFFSET ${offset}`;
 
-        console.log(sql)
         // Eksekusi query
         const { rows } = await db.query(sql, values);
-        console.log(rows)
 
         // Render halaman
         res.render('./purchases/purchases', {
@@ -116,23 +112,76 @@ exports.getAPIAddPurchases = async(req, res) => {
         return goodsData
     }
     const goodsData = await getGoodsData()
-
-    // ambil data purchases
+    
+    // ambil data purchases terbaru
     async function getPurchasesData() {
         const { rows } = await db.query('SELECT * FROM purchases ORDER BY time ASC')
         const purchasesData = rows.pop()
         return purchasesData
     }
     const purchasesData = await getPurchasesData()
+    const invoice = purchasesData.invoice
+    
+    // Ambil Data purchaseitems & nama barang berdasarkan invoice
+    async function getPurchaseitems (invoice) {
+        const { rows } = await db.query(`SELECT purchaseitems.itemcode, goods.name, SUM(quantity) AS quantity, purchaseitems.purchaseprice, SUM(totalprice) AS totalprice
+        FROM purchaseitems
+        INNER JOIN goods ON purchaseitems.itemcode = goods.barcode
+        WHERE invoice = $1
+        GROUP BY purchaseitems.itemcode, goods.name, purchaseitems.purchaseprice`, [invoice])
+        const purchaseitems = rows
+        return purchaseitems
+    }
+    const purchaseitems = await getPurchaseitems(invoice)
 
-    res.json({purchasesData, operator, goodsData})
+    // Ambil Data Suppliers
+    async function getSuppliersData () {
+        const { rows } = await db.query('SELECT * FROM suppliers')
+        const suppliersData = rows
+        return suppliersData
+    }
+    const suppliersData = await getSuppliersData()
+    
+    res.json({purchasesData, operator, goodsData, purchaseitems, suppliersData})
 }
 
 exports.putAPIAddPurchases = async (req, res) => {
     const { barcode, quantity, purchasePriceNumber, totalPriceNumber, invoice } = req.body
-    console.log(invoice, barcode, quantity, purchasePriceNumber, totalPriceNumber)
+    console.log(req.body)
 
     const addPurchaseitems = await db.query('INSERT INTO purchaseitems(invoice, itemcode, quantity, purchaseprice, totalprice) VALUES ($1, $2, $3, $4, $5)', [invoice, barcode, quantity, purchasePriceNumber, totalPriceNumber])
+
+    // Ambil Data purchaseitems & nama barang berdasarkan invoice
+    async function getPurchaseitems (invoice) {
+        const { rows } = await db.query(`SELECT purchaseitems.itemcode, goods.name, SUM(quantity) AS quantity, purchaseitems.purchaseprice, SUM(totalprice) AS totalprice
+        FROM purchaseitems
+        INNER JOIN goods ON purchaseitems.itemcode = goods.barcode
+        WHERE invoice = $1
+        GROUP BY purchaseitems.itemcode, goods.name, purchaseitems.purchaseprice`, [invoice])
+        const purchaseitems = rows
+        return purchaseitems
+    }
+    const purchaseitems = await getPurchaseitems(invoice)
+
+    // Ambil Data totalsum
+    async function getTotalsum () {
+        const { rows } = await db.query('SELECT totalsum FROM purchases WHERE invoice = $1', [invoice])
+        const totalsum = rows
+        return totalsum
+    }
+    const totalsum = await getTotalsum(invoice)
+
+    res.json({purchaseitems, totalsum: totalsum[0].totalsum})
+}
+
+exports.postAPIAddPurchases = async (req, res) => {
+    const { supplierid, invoice } = req.body
+    console.log(req.body)
+
+    // Tambahkan Data Supplier ke Table Purchase
+    const addData = await db.query('UPDATE purchases SET supplier = $1 WHERE invoice = $2', [supplierid, invoice])
+
+    res.redirect ('/purchases')
 }
 
 exports.getAddPurchases = async(req, res) => {
