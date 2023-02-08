@@ -17,7 +17,7 @@
                     <div class="col-sm-4">
                         <fieldset class="">
                             <label>Invoice</label>
-                            <input type="text" id="invoice" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
+                            <input type="text" id="invoice" value="<%=invoice%>" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
                                 disabled>
                         </fieldset>
                     </div>
@@ -120,6 +120,9 @@
                     <th>
                         Total Price
                     </th>
+                    <th>
+
+                    </th>
                 </tr>
             </thead>
             <tbody id="purchaseitemsTableBody">
@@ -167,88 +170,26 @@
 
     <script>
         moment.locale("id")
+        var invoice = $('#invoice').val()
 
-        function readDataPurchaseitems() {
+        function readDataPurchaseitems(invoice) {
 
             $.ajax({
-                url: "http://localhost:3000/api/purchases/add",
+                url: `http://localhost:3000/api/purchases/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
-                    $('#purchaseitemsTableBody').empty();
-                    const purchaseitems = response.purchaseitems;
-                    for (let i = 0; i < purchaseitems.length; i++) {
-                        const itemcode = purchaseitems[i].itemcode;
-                        const name = purchaseitems[i].name;
-                        const quantity = purchaseitems[i].quantity;
-                        const purchaseprice = purchaseitems[i].purchaseprice;
-                        const toFormatPP = purchaseprice * 1
-                        const totalprice = purchaseitems[i].totalprice;
-                        const toFormatTP = totalprice * 1
-                        $('#purchaseitemsTableBody').append(`
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td>${itemcode}</td>
-                            <td>${name}</td>
-                            <td>${quantity}</td>
-                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
-                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
-                        </tr>
-                        `);
-                    }
+                    updatePurchaseitems(response)
                 }
             });
         }
 
-        function postSuppliersData(data) {
-            $("#finish").click(function () {
-                $.ajax({
-                    type: "POST",
-                    url: "http://localhost:3000/api/purchases/add",
-                    data: { data },
-                    success: function () {
-                        window.location.href = '/purchases'
-                    }
-                });
-            });
-        }
-
-        //catatan: agar tidak terjadi bug, kalikan 1 pada angka untuk memastikan tidak ada scale di belakang angka
-        //kemudian ubah menjadi string
-        function formatRupiah(angka, prefix) {
-            var number_string = angka.replace(/[^,\d]/g, '').toString(),
-                split = number_string.split(','),
-                sisa = split[0].length % 3,
-                rupiah = split[0].substr(0, sisa),
-                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-            // tambahkan titik jika yang di input sudah menjadi angka ribuan
-            if (ribuan) {
-                separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
-            }
-
-            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
-        }
-
-        function pemecahRupiah(angka) {
-            const terpecah = parseInt(angka.replace(/[^0-9]/g, ''))
-            return terpecah
-        }
-
-        $(document).ready(function () {
-
-            // Tampilkan table purchaseitems
-            readDataPurchaseitems()
-
-            // Ambil Data Purchases dan purchaseitems
+        function readPurchasesandGoodsData(invoice) {
             $.ajax({
-                url: "http://localhost:3000/api/purchases/add",
+                url: `http://localhost:3000/api/purchases/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
                     // value input purchase
-                    const { invoice, time, totalsum } = response.purchasesData
-                    $('#invoice').val(invoice)
+                    const {time, totalsum } = response.purchasesData[0]
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
                     const formattedTS = totalsum * 1
@@ -318,6 +259,99 @@
                     }))
                 }
             });
+        }
+
+        function postSuppliersData(data) {
+            $("#finish").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:3000/api/purchases/add",
+                    data: { data },
+                    success: function () {
+                        window.location.href = '/purchases'
+                    }
+                });
+            });
+        }
+
+        function updatePurchaseitems(response) {
+            $('#purchaseitemsTableBody').empty();
+            const purchaseitems = response.purchaseitems;
+            for (let i = 0; i < purchaseitems.length; i++) {
+                const id = purchaseitems[i].id
+                const itemcode = purchaseitems[i].itemcode;
+                const name = purchaseitems[i].name;
+                const quantity = purchaseitems[i].quantity;
+                const purchaseprice = purchaseitems[i].purchaseprice;
+                const toFormatPP = purchaseprice * 1
+                const totalprice = purchaseitems[i].totalprice;
+                const toFormatTP = totalprice * 1
+
+                $('#purchaseitemsTableBody').append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${itemcode}</td>
+                            <td>${name}</td>
+                            <td>${quantity}</td>
+                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
+                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                            <td>
+                                                    <button 
+                                                        class="btn btn-danger btn-circle btn-delete" id-data="${id}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                            </td>
+                        </tr>
+                        `);
+            }
+        }
+
+        const deleteData = (id) => {
+            $.ajax({
+                method: 'DELETE',
+                url: `http://localhost:3000/api/purchases/edit/delete/${id}`,
+                data: {},
+                success: function(){
+                    console.log('hapus sukses')
+                    readDataPurchaseitems(invoice)
+                }
+            })
+                .fail(function () {
+                    alert("gagal pake jquery")
+                })
+        }
+
+        //catatan: agar tidak terjadi bug, kalikan 1 pada angka untuk memastikan tidak ada scale di belakang angka
+        //kemudian ubah menjadi string
+        function formatRupiah(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
+
+        function pemecahRupiah(angka) {
+            const terpecah = parseInt(angka.replace(/[^0-9]/g, ''))
+            return terpecah
+        }
+
+        $(document).ready(function () {
+
+            // Tampilkan table purchaseitems
+            readDataPurchaseitems(invoice)
+
+            // Ambil Data Purchases dan Goods
+            readPurchasesandGoodsData(invoice)
 
             // kirimkan Data Supplier ke Controller
             $("#finish").click(function () {
@@ -363,34 +397,21 @@
                         type: "put",
                         data: params,
                         success: function (response) {
-                            $('#purchaseitemsTableBody').empty();
-                            const purchaseitems = response.purchaseitems;
-                            for (let i = 0; i < purchaseitems.length; i++) {
-                                const itemcode = purchaseitems[i].itemcode;
-                                const name = purchaseitems[i].name;
-                                const quantity = purchaseitems[i].quantity;
-                                const purchaseprice = purchaseitems[i].purchaseprice;
-                                const toFormatPP = purchaseprice * 1
-                                const totalprice = purchaseitems[i].totalprice;
-                                const toFormatTP = totalprice * 1
-                                $('#purchaseitemsTableBody').append(`
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td>${itemcode}</td>
-                            <td>${name}</td>
-                            <td>${quantity}</td>
-                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
-                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
-                        </tr>
-                        `);
-                            }
-
+                            updatePurchaseitems(response)
                             const totalsum = response.totalsum * 1
                             $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
                         }
                     });
                 }
             });
+
+            $('table tbody').on('click', '.btn-delete', function (e) {
+                e.preventDefault()
+                const id = $(this).attr('id-data')
+                console.log(id)
+                deleteData(id)
+                readDataPurchaseitems(invoice)
+            })
         });
     </script>
 

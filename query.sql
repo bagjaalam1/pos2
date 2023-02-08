@@ -55,10 +55,16 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION update_goods_stock()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE goods
-  SET stock = stock + NEW.quantity
-  WHERE barcode = NEW.itemcode;
-  RETURN NEW;
+  IF (TG_OP = 'INSERT') THEN
+    UPDATE goods
+    SET stock = stock + NEW.quantity
+    WHERE barcode = NEW.itemcode;
+  ELSIF (TG_OP = 'DELETE') THEN
+    UPDATE goods
+    SET stock = stock - OLD.quantity
+    WHERE barcode = OLD.itemcode;
+  END IF;
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 

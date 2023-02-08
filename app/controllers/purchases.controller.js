@@ -147,17 +147,16 @@ exports.getAPIAddPurchases = async(req, res) => {
 
 exports.putAPIAddPurchases = async (req, res) => {
     const { barcode, quantity, purchasePriceNumber, totalPriceNumber, invoice } = req.body
-    console.log(req.body)
 
     const addPurchaseitems = await db.query('INSERT INTO purchaseitems(invoice, itemcode, quantity, purchaseprice, totalprice) VALUES ($1, $2, $3, $4, $5)', [invoice, barcode, quantity, purchasePriceNumber, totalPriceNumber])
 
     // Ambil Data purchaseitems & nama barang berdasarkan invoice
     async function getPurchaseitems (invoice) {
-        const { rows } = await db.query(`SELECT purchaseitems.itemcode, goods.name, SUM(quantity) AS quantity, purchaseitems.purchaseprice, SUM(totalprice) AS totalprice
+        const { rows } = await db.query(`SELECT purchaseitems.id, purchaseitems.itemcode, goods.name, quantity, purchaseitems.purchaseprice, totalprice
         FROM purchaseitems
         INNER JOIN goods ON purchaseitems.itemcode = goods.barcode
         WHERE invoice = $1
-        GROUP BY purchaseitems.itemcode, goods.name, purchaseitems.purchaseprice`, [invoice])
+        ORDER BY id ASC`, [invoice])
         const purchaseitems = rows
         return purchaseitems
     }
@@ -176,7 +175,6 @@ exports.putAPIAddPurchases = async (req, res) => {
 
 exports.postAPIAddPurchases = async (req, res) => {
     const { supplierid, invoice } = req.body
-    console.log(req.body)
 
     // Tambahkan Data Supplier ke Table Purchase
     const addData = await db.query('UPDATE purchases SET supplier = $1 WHERE invoice = $2', [supplierid, invoice])
@@ -187,4 +185,74 @@ exports.postAPIAddPurchases = async (req, res) => {
 exports.getAddPurchases = async(req, res) => {
     const { user } = req.session
     res.render('./purchases/purchasesAdd', {name: user.name})
+}
+
+exports.getAPIEditPurchases = async(req, res) => {
+    const operator = req.session.user
+    const { invoice } = req.params
+
+    // Ambil Data Goods
+    async function getGoodsData() {
+        const { rows } = await db.query('SELECT * FROM goods')
+        const goodsData = rows
+        return goodsData
+    }
+    const goodsData = await getGoodsData()
+    
+    // ambil data purchases terbaru berdasarkan invoice
+    async function getPurchasesData(invoice) {
+        const { rows } = await db.query('SELECT * FROM purchases WHERE invoice = $1', [invoice])
+        const purchasesData = rows
+        return purchasesData
+    }
+    const purchasesData = await getPurchasesData(invoice)
+    
+    // Ambil Data purchaseitems & nama barang berdasarkan invoice
+    async function getPurchaseitems (invoice) {
+        const { rows } = await db.query(`SELECT purchaseitems.id, purchaseitems.itemcode, goods.name, quantity, purchaseitems.purchaseprice, totalprice
+        FROM purchaseitems
+        INNER JOIN goods ON purchaseitems.itemcode = goods.barcode
+        WHERE invoice = $1
+        ORDER BY id ASC`, [invoice])
+        const purchaseitems = rows
+        return purchaseitems
+    }
+    const purchaseitems = await getPurchaseitems(invoice)
+    console.log(purchaseitems)
+    // Ambil Data Suppliers
+    async function getSuppliersData () {
+        const { rows } = await db.query('SELECT * FROM suppliers')
+        const suppliersData = rows
+        return suppliersData
+    }
+    const suppliersData = await getSuppliersData()
+    
+    res.json({purchasesData, operator, goodsData, purchaseitems, suppliersData})
+}
+
+exports.getEditPurchases = async(req, res) => {
+    const { user } = req.session
+    const { invoice } = req.params
+    res.render('./purchases/purchasesEdit', {name : user.name, invoice})
+}
+
+exports.deleteAPIEditPurchases = async (req, res) => {
+    const { id } = req.params
+    const deletePurchaseitems = await db.query('DELETE FROM purchaseitems WHERE id = $1', [id])
+    res.json({})
+}
+
+exports.deletePurchases = async (req, res) => {
+    try {
+        const { invoice } = req.params
+        console.log(invoice)
+
+        // Hapus Data dari Database
+        const deletePurchases = await db.query('DELETE FROM purchases WHERE invoice = $1', [invoice])
+
+        res.redirect('/purchases')
+    } catch (e) {
+        console.error(e);
+        res.send('Terjadi error!');
+    }
 }
