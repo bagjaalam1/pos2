@@ -15,6 +15,7 @@ exports.getUnits = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/units/' ||
+            req.url === '/units' ||
                 req.url === `/units?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/units?display=${display}`
                 ? `/units?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`

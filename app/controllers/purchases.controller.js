@@ -218,7 +218,7 @@ exports.getAPIEditPurchases = async(req, res) => {
         return purchaseitems
     }
     const purchaseitems = await getPurchaseitems(invoice)
-    console.log(purchaseitems)
+
     // Ambil Data Suppliers
     async function getSuppliersData () {
         const { rows } = await db.query('SELECT * FROM suppliers')
@@ -245,7 +245,6 @@ exports.deleteAPIEditPurchases = async (req, res) => {
 exports.deletePurchases = async (req, res) => {
     try {
         const { invoice } = req.params
-        console.log(invoice)
 
         // Hapus Data dari Database
         const deletePurchases = await db.query('DELETE FROM purchases WHERE invoice = $1', [invoice])

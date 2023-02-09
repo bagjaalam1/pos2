@@ -16,6 +16,7 @@ exports.getSuppliers = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/suppliers' ||
+            req.url === '/suppliers/' ||
                 req.url === `/suppliers?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/suppliers?display=${display}`
                 ? `/suppliers?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`

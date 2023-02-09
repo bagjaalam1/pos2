@@ -38,16 +38,21 @@ EXECUTE FUNCTION update_purchase_total_sum();
 --
 
 --reset invoice seq ketika berganti hari
-CREATE OR REPLACE FUNCTION reset_invoice_number()
+CREATE OR REPLACE FUNCTION restart_invoice_sequence()
 RETURNS TRIGGER AS $$
-BEGIN 
-  IF (date_part('day', NOW()) != date_part('day', OLD.invoice_date)) THEN
+BEGIN
+  IF (to_char(now(), 'YYYYMMDD') != substring(OLD.invoice, 5, 8)) THEN
     ALTER SEQUENCE no_urut RESTART WITH 1;
   END IF;
   NEW.invoice := 'INV-' || to_char(NOW(), 'YYYYMMDD') || '-' || nextval('no_urut');
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER restart_invoice_sequence_trigger
+BEFORE INSERT ON purchases
+FOR EACH ROW
+EXECUTE FUNCTION restart_invoice_sequence();
 
 --
 

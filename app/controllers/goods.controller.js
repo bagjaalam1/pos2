@@ -2,7 +2,6 @@ const db = require('../models/index')
 const { IDRupiah } = require('../../helpers/util')
 const path = require('path')
 const fs = require('fs')
-const { get } = require('http')
 
 exports.getGoods = async (req, res) => {
     try {
@@ -19,6 +18,7 @@ exports.getGoods = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/goods/' ||
+            req.url === '/goods' ||
                 req.url === `/goods?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/goods?display=${display}`
                 ? `/goods?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -249,7 +249,7 @@ exports.editGoods = async (req, res) => {
         } else if (!req.files) {
             const { rows } = await db.query("SELECT picture FROM goods WHERE barcode = $1", [barcode])
             const namePictureData = rows[0].picture
-            console.log(namePictureData)
+
             const editGoods = await db.query(`UPDATE goods SET 
                 barcode = $1,
                 name = $2,
