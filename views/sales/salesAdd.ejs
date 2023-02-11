@@ -1,0 +1,408 @@
+<title> POS - Sales </title>
+<%- include('../partials/header.ejs') %>
+    <!-- Page Heading -->
+    <div class="align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-1 text-gray-800">Sales</h1>
+    </div>
+
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h1>Transaction</h1>
+        </div>
+
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Invoice</label>
+                            <input type="text" id="invoice" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
+                                disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Time</label>
+                            <input type="text" id="time" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="Optional" disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Operator</label>
+                            <input type="text" id="operator" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="Optional" disabled>
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <hr>
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Goods Barcode</label>
+                            <select name="barcode" class="form-control mb-2 mr-sm-2 mb-sm-0" id="barcode">
+
+                            </select>
+                        </fieldset>
+                        <br>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Goods Name</label>
+                            <input type="text" id="goods_name" name="name" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Stock</label>
+                            <input type="text" name="stock" id="stock" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <fieldset class="">
+                            <label>Selling Price</label>
+                            <input type="text" id="sellingprice" name="sellingprice"
+                                class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Qty</label>
+                            <input type="number" id="quantity" name="quantity" class="form-control mb-2 mr-sm-2 mb-sm-0"
+                                placeholder="" required>
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-4">
+                        <fieldset>
+                            <label>Total Price</label>
+                            <input type="text" id="totalprice" name="totalprice"
+                                class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+            <br>
+            <button id="add" class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="text">Add</span>
+            </button>
+        </div>
+        <hr>
+        <table class="table table-striped " width="100%" cellspacing="0" role="grid">
+            <thead>
+                <tr>
+                    <th>
+                        No
+                    </th>
+                    <th>
+                        Barcode
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Qty
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Total Price
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="saleitemsTableBody">
+
+            </tbody>
+        </table>
+        <div class="card-footer">
+            <form action="">
+                <div class="form-group row">
+                    <label for="totalsumInput" class="col-sm-2 col-form-label">Total Summary</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="totalsumInput" disabled>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="payInput" class="col-sm-2 col-form-label">Pay</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="payInput">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="changeInput" class="col-sm-2 col-form-label">Change</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="changeInput" disabled>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="select_customer" class="col-sm-2 col-form-label">Customer</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="select_customer" name="nameCustomer"
+                            required>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" id="finish" class="btn btn-success btn-icon-split">
+                    <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="text">Finish</span>
+                </button>
+                <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
+                    <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                        <i class="fa fa-undo" aria-hidden="true"></i>
+                    </span>
+                    <span class="text">Back</span>
+                </a>
+            </form>
+        </div>
+    </div>
+
+
+    </div>
+    <!-- /.container-fluid -->
+    </div>
+    <!-- End of Main Content -->
+
+    <script>
+        moment.locale("id")
+
+        function readDataPurchaseitems() {
+
+            $.ajax({
+                url: "http://localhost:3000/api/sales/add",
+                method: "GET",
+                success: function (response) {
+                    $('#saleitemsTableBody').empty();
+                    const saleitems = response.saleitems;
+                    for (let i = 0; i < saleitems.length; i++) {
+                        const itemcode = saleitems[i].itemcode;
+                        const name = saleitems[i].name;
+                        const quantity = saleitems[i].quantity;
+                        const sellingprice = saleitems[i].sellingprice;
+                        const toFormatPP = sellingprice * 1
+                        const totalprice = saleitems[i].totalprice;
+                        const toFormatTP = totalprice * 1
+                        $('#saleitemsTableBody').append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${itemcode}</td>
+                            <td>${name}</td>
+                            <td>${quantity}</td>
+                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
+                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                        </tr>
+                        `);
+                    }
+                }
+            });
+        }
+
+        function postSuppliersData(data) {
+            $("#finish").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:3000/api/sales/add",
+                    data: { data },
+                    success: function () {
+                        window.location.href = '/sales'
+                    }
+                });
+            });
+        }
+
+        //catatan: agar tidak terjadi bug, kalikan 1 pada angka untuk memastikan tidak ada scale di belakang angka
+        //kemudian ubah menjadi string
+        function formatRupiah(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        }
+
+        function pemecahRupiah(angka) {
+            const terpecah = parseInt(angka.replace(/[^0-9]/g, ''))
+            return terpecah
+        }
+
+        $(document).ready(function () {
+
+            // Tampilkan table saleitems
+            readDataPurchaseitems()
+
+            // Ambil Data Sales dan saleitems
+            $.ajax({
+                url: "http://localhost:3000/api/sales/add",
+                method: "GET",
+                success: function (response) {
+                    // value input sales
+                    const { invoice, time, totalsum } = response.salesData
+                    $('#invoice').val(invoice)
+                    $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
+                    $('#operator').val(response.operator.name)
+                    const formattedTS = totalsum * 1
+                    $('#totalsumInput').val(formatRupiah(formattedTS.toString(), "Rp. "))
+
+                    // Value Input Goods
+                    response.goodsData.forEach(function (item) {
+                        $('#barcode').append($('<option>', {
+                            value: item.barcode,
+                            text: item.barcode + ' - ' + item.name,
+                        }));
+                    });
+
+                    $('#barcode').prepend($('<option>', {
+                        value: '',
+                        text: 'Select Goods',
+                        selected: true,
+                        disabled: true
+                    })).on('change', function () {
+                        // Cari item dengan barcode yang dipilih
+                        var selectedItem = response.goodsData.find(function (item) {
+                            return item.barcode === this.value;
+                        }, this);
+
+                        // Tampilkan data dalam input value lain
+                        if (selectedItem) {
+                            $('#goods_name').val(selectedItem.name);
+                            $('#stock').val(selectedItem.stock);
+                            const sellingPriceNumber = selectedItem.sellingprice * 1
+                            $('#sellingprice').val(formatRupiah(sellingPriceNumber.toString(), "Rp. "));
+                            $('#quantity').val('')
+                            $('#totalprice').val('')
+                        } else {
+                            $('#goods_name').val('');
+                            $('#stock').val('')
+                            $('#sellingprice').val('');
+                        }
+
+                        // perkalian quantity otomatis 
+                        $('#quantity').on('keyup', function () {
+                            var quantity = this.value;
+                            var sellingprice = selectedItem.sellingprice;
+
+                            if (!isNaN(quantity) && !isNaN(sellingprice)) {
+                                const hasilKali = quantity * sellingprice
+                                $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
+                            } else {
+                                $('#totalprice').val('');
+                            }
+                        });
+                    });
+
+                    // Tampilkan Select Option Suppliers
+                    const suppliersData = response.suppliersData
+                    suppliersData.forEach(function (item) {
+                        $('#select_customer').append($('<option>', {
+                            value: item.customerid,
+                            text: item.name,
+                        }));
+                    });
+
+                    $('#select_customer').prepend($('<option>', {
+                        value: '',
+                        text: 'Select Customer',
+                        selected: true,
+                        disabled: true
+                    }))
+                }
+            });
+
+            // kirimkan Data Customer ke Controller
+            $("#finish").click(function (e) {
+                e.preventDefault()
+                const customerid = $('#select_customer').val()
+                if (customerid == '' || customerid == null) {
+                    console.log('customerid kosong')
+                    //do nothing
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "http://localhost:3000/api/sales/add",
+                        data: {
+                            customerid: $('#select_customer').val(),
+                            invoice: $('#invoice').val()
+                        },
+                        success: function () {
+                            window.location.href = '/sales'
+                        }
+                    });
+                }
+
+            });
+
+            $("#add").click(function (event) {
+                event.preventDefault();
+                const barcode = $("#barcode").val();
+                const sellingprice = $('#sellingprice').val()
+                const sellingPriceNumber = pemecahRupiah(sellingprice);
+                const totalprice = $('#totalprice').val()
+                const totalPriceNumber = pemecahRupiah(totalprice);
+                const invoice = $('#invoice').val()
+                const quantity = $('#quantity').val()
+
+                let params = { barcode, sellingPriceNumber, totalPriceNumber, invoice, quantity }
+
+                if (!barcode || !sellingPriceNumber || !totalPriceNumber || !invoice || !quantity) {
+                    // do nothing. biar ga error aja
+                } else {
+                    // Mengirim data menggunakan ajax
+                    $.ajax({
+                        url: "http://localhost:3000/api/sales/add",
+                        type: "put",
+                        data: params,
+                        success: function (response) {
+                            $('#saleitemsTableBody').empty();
+                            const saleitems = response.saleitems;
+                            for (let i = 0; i < saleitems.length; i++) {
+                                const itemcode = saleitems[i].itemcode;
+                                const name = saleitems[i].name;
+                                const quantity = saleitems[i].quantity;
+                                const sellingprice = saleitems[i].sellingprice;
+                                const toFormatSP = sellingprice * 1
+                                const totalprice = saleitems[i].totalprice;
+                                const toFormatTP = totalprice * 1
+                                $('#saleitemsTableBody').append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${itemcode}</td>
+                            <td>${name}</td>
+                            <td>${quantity}</td>
+                            <td>${formatRupiah(toFormatSP.toString(), "Rp. ")}</td>
+                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                        </tr>
+                        `);
+                            }
+
+                            const totalsum = response.totalsum * 1
+                            $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer.ejs') %>
