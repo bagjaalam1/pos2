@@ -56,7 +56,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_goods_stock_trigger
-AFTER INSERT ON purchaseitems
+AFTER INSERT OR DELETE ON purchaseitems
 FOR EACH ROW
 EXECUTE FUNCTION update_goods_stock();
 
@@ -125,7 +125,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_goods_stock_penj_trigger
-AFTER INSERT ON saleitems
+AFTER INSERT OR DELETE ON saleitems
 FOR EACH ROW
 EXECUTE FUNCTION update_goods_stock_penj();
 

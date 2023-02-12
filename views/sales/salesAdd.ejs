@@ -137,7 +137,7 @@
                 <div class="form-group row">
                     <label for="payInput" class="col-sm-2 col-form-label">Pay</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="payInput">
+                        <input type="text" class="form-control" id="payInput" required>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -149,19 +149,20 @@
                 <div class="form-group row">
                     <label for="select_customer" class="col-sm-2 col-form-label">Customer</label>
                     <div class="col-sm-10">
-                        <select class="form-control" id="select_customer" name="nameCustomer"
-                            required>
+                        <select class="form-control" id="select_customer" name="nameCustomer" required>
                         </select>
                     </div>
                 </div>
                 <button type="submit" id="finish" class="btn btn-success btn-icon-split">
-                    <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <span class="icon text-white-50"
+                        style="display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-plus"></i>
                     </span>
                     <span class="text">Finish</span>
                 </button>
                 <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
-                    <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <span class="icon text-white-50"
+                        style="display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-undo" aria-hidden="true"></i>
                     </span>
                     <span class="text">Back</span>
@@ -178,6 +179,7 @@
 
     <script>
         moment.locale("id")
+        const formatter = IDRupiah()
 
         function readDataPurchaseitems() {
 
@@ -192,17 +194,15 @@
                         const name = saleitems[i].name;
                         const quantity = saleitems[i].quantity;
                         const sellingprice = saleitems[i].sellingprice;
-                        const toFormatPP = sellingprice * 1
                         const totalprice = saleitems[i].totalprice;
-                        const toFormatTP = totalprice * 1
                         $('#saleitemsTableBody').append(`
                         <tr>
                             <td>${i + 1}</td>
                             <td>${itemcode}</td>
                             <td>${name}</td>
                             <td>${quantity}</td>
-                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
-                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                            <td>${formatter.format(sellingprice)}</td>
+                            <td>${formatter.format(totalprice)}</td>
                         </tr>
                         `);
                     }
@@ -242,9 +242,12 @@
             return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
         }
 
-        function pemecahRupiah(angka) {
-            const terpecah = parseInt(angka.replace(/[^0-9]/g, ''))
-            return terpecah
+        function pemecahRupiah(rupiahString) {
+            return parseInt(rupiahString.replace(/[Rp\.\,]/g, "") / 100);
+        }
+
+        function toNumber(string) {
+            return parseInt(string.replace(/[Rp\.\,]/g, ""))
         }
 
         $(document).ready(function () {
@@ -263,7 +266,7 @@
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
                     const formattedTS = totalsum * 1
-                    $('#totalsumInput').val(formatRupiah(formattedTS.toString(), "Rp. "))
+                    $('#totalsumInput').val(formatter.format(totalsum))
 
                     // Value Input Goods
                     response.goodsData.forEach(function (item) {
@@ -288,8 +291,8 @@
                         if (selectedItem) {
                             $('#goods_name').val(selectedItem.name);
                             $('#stock').val(selectedItem.stock);
-                            const sellingPriceNumber = selectedItem.sellingprice * 1
-                            $('#sellingprice').val(formatRupiah(sellingPriceNumber.toString(), "Rp. "));
+                            const sellingPrice = selectedItem.sellingprice
+                            $('#sellingprice').val(formatter.format(sellingPrice));
                             $('#quantity').val('')
                             $('#totalprice').val('')
                         } else {
@@ -305,16 +308,16 @@
 
                             if (!isNaN(quantity) && !isNaN(sellingprice)) {
                                 const hasilKali = quantity * sellingprice
-                                $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
+                                $('#totalprice').val(formatter.format(hasilKali));
                             } else {
                                 $('#totalprice').val('');
                             }
                         });
                     });
 
-                    // Tampilkan Select Option Suppliers
-                    const suppliersData = response.suppliersData
-                    suppliersData.forEach(function (item) {
+                    // Tampilkan Select Option Customers
+                    const customersData = response.customersData
+                    customersData.forEach(function (item) {
                         $('#select_customer').append($('<option>', {
                             value: item.customerid,
                             text: item.name,
@@ -342,6 +345,8 @@
                         type: "POST",
                         url: "http://localhost:3000/api/sales/add",
                         data: {
+                            pay: pemecahRupiah($('#payInput').val()),
+                            change: pemecahRupiah($('#changeInput').val()),
                             customerid: $('#select_customer').val(),
                             invoice: $('#invoice').val()
                         },
@@ -362,6 +367,8 @@
                 const totalPriceNumber = pemecahRupiah(totalprice);
                 const invoice = $('#invoice').val()
                 const quantity = $('#quantity').val()
+                console.log(sellingprice, totalprice)
+                console.log(sellingPriceNumber, totalPriceNumber)
 
                 let params = { barcode, sellingPriceNumber, totalPriceNumber, invoice, quantity }
 
@@ -381,25 +388,38 @@
                                 const name = saleitems[i].name;
                                 const quantity = saleitems[i].quantity;
                                 const sellingprice = saleitems[i].sellingprice;
-                                const toFormatSP = sellingprice * 1
                                 const totalprice = saleitems[i].totalprice;
-                                const toFormatTP = totalprice * 1
                                 $('#saleitemsTableBody').append(`
                         <tr>
                             <td>${i + 1}</td>
                             <td>${itemcode}</td>
                             <td>${name}</td>
                             <td>${quantity}</td>
-                            <td>${formatRupiah(toFormatSP.toString(), "Rp. ")}</td>
-                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                            <td>${formatter.format(parseInt(sellingprice))}</td>
+                            <td>${formatter.format(parseInt(totalprice))}</td>
                         </tr>
                         `);
                             }
 
-                            const totalsum = response.totalsum * 1
-                            $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
+                            const totalsum = response.totalsum
+                            $('#totalsumInput').val(formatter.format(totalsum.toString()))
                         }
                     });
+                }
+            });
+
+
+            $('#payInput').keyup(function () {
+                const pay = toNumber($(this).val())
+                const total = pemecahRupiah($('#totalsumInput').val());
+                console.log(total)
+                console.log(pay)
+                const change = pay - total;
+                $(this).val(formatRupiah(pay.toString()))
+                if (change > 0) {
+                    $('#changeInput').val(formatter.format(change));
+                } else {
+                    $('#changeInput').val(formatter.format(change));
                 }
             });
         });

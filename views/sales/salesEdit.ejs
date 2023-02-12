@@ -70,7 +70,7 @@
                     <div class="col-sm-4">
                         <fieldset class="">
                             <label>Purchase Price</label>
-                            <input type="text" id="purchaseprice" name="purchaseprice"
+                            <input type="text" id="sellingprice" name="sellingprice"
                                 class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
                         </fieldset>
                     </div>
@@ -125,7 +125,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody id="purchaseitemsTableBody">
+            <tbody id="saleitemsTableBody">
 
             </tbody>
         </table>
@@ -138,10 +138,21 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="select_supplier" class="col-sm-2 col-form-label">Supplier</label>
+                    <label for="payInput" class="col-sm-2 col-form-label">Pay</label>
                     <div class="col-sm-10">
-                        <select class="form-control" id="select_supplier" placeholder="Nama" name="nameSupplier"
-                            required>
+                        <input type="text" class="form-control" id="payInput" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="changeInput" class="col-sm-2 col-form-label">Change</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="changeInput" disabled>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="select_customer" class="col-sm-2 col-form-label">Customer</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="select_customer" name="nameCustomer" required>
                         </select>
                     </div>
                 </div>
@@ -171,29 +182,29 @@
     <script>
         moment.locale("id")
         var invoice = $('#invoice').val()
+        const formatter = IDRupiah()
 
-        function readDataPurchaseitems(invoice) {
+        function readDataSaleitems(invoice) {
 
             $.ajax({
-                url: `http://localhost:3000/api/purchases/edit/${invoice}`,
+                url: `http://localhost:3000/api/sales/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
-                    updatePurchaseitems(response)
+                    updateSaleitems(response)
                 }
             });
         }
 
-        function readPurchasesandGoodsData(invoice) {
+        function readSalesandGoodsData(invoice) {
             $.ajax({
-                url: `http://localhost:3000/api/purchases/edit/${invoice}`,
+                url: `http://localhost:3000/api/sales/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
-                    // value input purchase
-                    const {time, totalsum } = response.purchasesData[0]
+                    // value input sales
+                    const {time, totalsum } = response.salesData[0]
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
-                    const formattedTS = totalsum * 1
-                    $('#totalsumInput').val(formatRupiah(formattedTS.toString(), "Rp. "))
+                    $('#totalsumInput').val(formatter.format(totalsum))
 
                     // Value Input Goods
                     response.goodsData.forEach(function (item) {
@@ -218,24 +229,24 @@
                         if (selectedItem) {
                             $('#goods_name').val(selectedItem.name);
                             $('#stock').val(selectedItem.stock);
-                            const purchasePriceNumber = selectedItem.purchaseprice * 1
-                            $('#purchaseprice').val(formatRupiah(purchasePriceNumber.toString(), "Rp. "));
+                            const sellingprice = selectedItem.sellingprice
+                            $('#sellingprice').val(formatter.format(sellingprice));
                             $('#quantity').val('')
                             $('#totalprice').val('')
                         } else {
                             $('#goods_name').val('');
                             $('#stock').val('')
-                            $('#purchaseprice').val('');
+                            $('#sellingprice').val('');
                         }
 
                         // perkalian quantity otomatis 
                         $('#quantity').on('keyup', function () {
                             var quantity = this.value;
-                            var purchaseprice = selectedItem.purchaseprice;
+                            var sellingprice = selectedItem.sellingprice;
 
-                            if (!isNaN(quantity) && !isNaN(purchaseprice)) {
-                                const hasilKali = quantity * purchaseprice
-                                $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
+                            if (!isNaN(quantity) && !isNaN(sellingprice)) {
+                                const hasilKali = quantity * sellingprice
+                                $('#totalprice').val(formatter.format(hasilKali));
                             } else {
                                 $('#totalprice').val('');
                             }
@@ -243,18 +254,18 @@
                     });
 
                     // Tampilkan Select Option Suppliers
-                    const suppliersData = response.suppliersData
-                    suppliersData.forEach(function (item) {
-                        $('#select_supplier').append($('<option>', {
-                            value: item.supplierid,
+                    const customersData = response.customersData
+                    customersData.forEach(function (item) {
+                        $('#select_customer').append($('<option>', {
+                            value: item.customerid,
                             text: item.name,
                         }));
                     });
 
-                    const suppliersDataINV = response.suppliersDataINV
-                    $('#select_supplier').prepend($('<option>', {
-                        value: suppliersDataINV.supplierid,
-                        text: suppliersDataINV.name,
+                    const customersDataINV = response.customersDataINV
+                    $('#select_customer').prepend($('<option>', {
+                        value: customersDataINV.customerid,
+                        text: customersDataINV.name,
                         selected: true,
                         disabled: true
                     }))
@@ -262,40 +273,38 @@
             });
         }
 
-        function postSuppliersData(data) {
+        function postCustomersData(data) {
             $("#finish").click(function () {
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:3000/api/purchases/add",
+                    url: "http://localhost:3000/api/sales/add",
                     data: { data },
                     success: function () {
-                        window.location.href = '/purchases'
+                        window.location.href = '/sales'
                     }
                 });
             });
         }
 
-        function updatePurchaseitems(response) {
-            $('#purchaseitemsTableBody').empty();
-            const purchaseitems = response.purchaseitems;
-            for (let i = 0; i < purchaseitems.length; i++) {
-                const id = purchaseitems[i].id
-                const itemcode = purchaseitems[i].itemcode;
-                const name = purchaseitems[i].name;
-                const quantity = purchaseitems[i].quantity;
-                const purchaseprice = purchaseitems[i].purchaseprice;
-                const toFormatPP = purchaseprice * 1
-                const totalprice = purchaseitems[i].totalprice;
-                const toFormatTP = totalprice * 1
+        function updateSaleitems(response) {
+            $('#saleitemsTableBody').empty();
+            const saleitems = response.saleitems;
+            for (let i = 0; i < saleitems.length; i++) {
+                const id = saleitems[i].id
+                const itemcode = saleitems[i].itemcode;
+                const name = saleitems[i].name;
+                const quantity = saleitems[i].quantity;
+                const sellingprice = saleitems[i].sellingprice;
+                const totalprice = saleitems[i].totalprice;
 
-                $('#purchaseitemsTableBody').append(`
+                $('#saleitemsTableBody').append(`
                         <tr>
                             <td>${i + 1}</td>
                             <td>${itemcode}</td>
                             <td>${name}</td>
                             <td>${quantity}</td>
-                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
-                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
+                            <td>${formatter.format(sellingprice)}</td>
+                            <td>${formatter.format(totalprice)}</td>
                             <td>
                                                     <button 
                                                         class="btn btn-danger btn-circle btn-delete" id-data="${id}">
@@ -310,10 +319,10 @@
         const deleteData = (id) => {
             $.ajax({
                 method: 'DELETE',
-                url: `http://localhost:3000/api/purchases/edit/delete/${id}`,
+                url: `http://localhost:3000/api/sales/edit/delete/${id}`,
                 data: {},
                 success: function(){
-                    readDataPurchaseitems(invoice)
+                    readDataSaleitems(invoice)
                 }
             })
                 .fail(function () {
@@ -340,35 +349,38 @@
             return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
         }
 
-        function pemecahRupiah(angka) {
-            const terpecah = parseInt(angka.replace(/[^0-9]/g, ''))
-            return terpecah
+        function pemecahRupiah(rupiahString) {
+            return parseInt(rupiahString.replace(/[Rp\.\,]/g, "") / 100);
+        }
+
+        function toNumber(string) {
+            return parseInt(string.replace(/[Rp\.\,]/g, ""))
         }
 
         $(document).ready(function () {
 
-            // Tampilkan table purchaseitems
-            readDataPurchaseitems(invoice)
+            // Tampilkan table saleitems
+            readDataSaleitems(invoice)
 
             // Ambil Data Purchases dan Goods
-            readPurchasesandGoodsData(invoice)
+            readSalesandGoodsData(invoice)
 
             // kirimkan Data Supplier ke Controller
             $("#finish").click(function () {
-                const supplierid = $('#select_supplier').val()
-                if (supplierid == '' || supplierid == null) {
-                    console.log('supplierid kosong')
+                const customerid = $('#select_customer').val()
+                if (customerid == '' || customerid == null) {
+                    console.log('customerid kosong')
                     //do nothing
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: "http://localhost:3000/api/purchases/add",
+                        url: "http://localhost:3000/api/sales/add",
                         data: {
-                            supplierid: $('#select_supplier').val(),
+                            customerid: $('#select_customer').val(),
                             invoice: $('#invoice').val()
                         },
                         success: function () {
-                            window.location.href = '/purchases'
+                            window.location.href = '/sales'
                         }
                     });
                 }
@@ -378,28 +390,28 @@
             $("#add").click(function (event) {
                 event.preventDefault();
                 const barcode = $("#barcode").val();
-                const purchaseprice = $('#purchaseprice').val()
-                const purchasePriceNumber = pemecahRupiah(purchaseprice);
+                const sellingprice = $('#sellingprice').val()
+                const sellingPriceNumber = pemecahRupiah(sellingprice);
                 const totalprice = $('#totalprice').val()
                 const totalPriceNumber = pemecahRupiah(totalprice);
                 const invoice = $('#invoice').val()
                 const quantity = $('#quantity').val()
-                console.log(barcode, purchasePriceNumber, totalPriceNumber, quantity)
+                console.log(barcode, sellingPriceNumber, totalPriceNumber, quantity)
 
-                let params = { barcode, purchasePriceNumber, totalPriceNumber, invoice, quantity }
+                let params = { barcode, sellingPriceNumber, totalPriceNumber, invoice, quantity }
 
-                if (!barcode || !purchasePriceNumber || !totalPriceNumber || !invoice || !quantity) {
+                if (!barcode || !sellingPriceNumber || !totalPriceNumber || !invoice || !quantity) {
                     // do nothing. biar ga error aja
                 } else {
                     // Mengirim data menggunakan ajax
                     $.ajax({
-                        url: "http://localhost:3000/api/purchases/add",
+                        url: "http://localhost:3000/api/sales/add",
                         type: "put",
                         data: params,
                         success: function (response) {
-                            updatePurchaseitems(response)
-                            const totalsum = response.totalsum * 1
-                            $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
+                            updateSaleitems(response)
+                            const totalsum = response.totalsum
+                            $('#totalsumInput').val(formatter.format(totalsum))
                         }
                     });
                 }
@@ -409,8 +421,22 @@
                 e.preventDefault()
                 const id = $(this).attr('id-data')
                 deleteData(id)
-                readDataPurchaseitems(invoice)
+                readDataSaleitems(invoice)
             })
+
+            $('#payInput').keyup(function () {
+                const pay = toNumber($(this).val())
+                const total = pemecahRupiah($('#totalsumInput').val());
+                console.log(total)
+                console.log(pay)
+                const change = pay - total;
+                $(this).val(formatRupiah(pay.toString()))
+                if (change > 0) {
+                    $('#changeInput').val(formatter.format(change));
+                } else {
+                    $('#changeInput').val(formatter.format(change));
+                }
+            });
         });
     </script>
 

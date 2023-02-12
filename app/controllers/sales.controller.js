@@ -110,6 +110,12 @@ exports.getAddSales = async(req, res) => {
     res.render('./sales/salesAdd', {name: user.name})
 }
 
+exports.getEditSales = async(req, res) => {
+    const { user } = req.session
+    const { invoice } = req.params
+    res.render('./sales/salesEdit', {name : user.name, invoice})
+}
+
 // API
 exports.getAPIAddSales = async(req, res) => {
     const operator = req.session.user
@@ -160,7 +166,7 @@ exports.putAPIAddSales = async (req, res) => {
     const addPurchaseitems = await db.query('INSERT INTO saleitems(invoice, itemcode, quantity, sellingprice, totalprice) VALUES ($1, $2, $3, $4, $5)', [invoice, barcode, quantity, sellingPriceNumber, totalPriceNumber])
 
     // Ambil Data saleitems & nama barang berdasarkan invoice
-    async function getPurchaseitems (invoice) {
+    async function getSaleitems (invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
         INNER JOIN goods ON saleitems.itemcode = goods.barcode
@@ -169,7 +175,7 @@ exports.putAPIAddSales = async (req, res) => {
         const saleitems = rows
         return saleitems
     }
-    const saleitems = await getPurchaseitems(invoice)
+    const saleitems = await getSaleitems(invoice)
 
     // Ambil Data totalsum
     async function getTotalsum () {
@@ -180,4 +186,75 @@ exports.putAPIAddSales = async (req, res) => {
     const totalsum = await getTotalsum(invoice)
 
     res.json({saleitems, totalsum: totalsum[0].totalsum})
+}
+
+exports.postAPIAddSales = async (req, res) => {
+    const { pay, change, customerid, invoice } = req.body
+
+    // Tambahkan Data Supplier ke Table Purchase
+    const addData = await db.query('UPDATE sales SET pay = $1, change = $2, customer = $3 WHERE invoice = $4', 
+    [pay, change, customerid, invoice])
+
+    res.redirect ('/sales')
+}
+
+exports.getAPIEditSales = async(req, res) => {
+    const operator = req.session.user
+    const { invoice } = req.params
+
+    // Ambil Data Goods
+    async function getGoodsData() {
+        const { rows } = await db.query('SELECT * FROM goods')
+        const goodsData = rows
+        return goodsData
+    }
+    const goodsData = await getGoodsData()
+    
+    // ambil data sales terbaru berdasarkan invoice
+    async function getSalesData(invoice) {
+        const { rows } = await db.query('SELECT * FROM sales WHERE invoice = $1', [invoice])
+        const salesData = rows
+        return salesData
+    }
+    const salesData = await getSalesData(invoice)
+    
+    // Ambil Data saleitems & nama barang berdasarkan invoice
+    async function getSaleitems (invoice) {
+        const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
+        FROM saleitems
+        INNER JOIN goods ON saleitems.itemcode = goods.barcode
+        WHERE invoice = $1
+        ORDER BY id ASC`, [invoice])
+        const saleitems = rows
+        return saleitems
+    }
+    const saleitems = await getSaleitems(invoice)
+
+    // Ambil Data Suppliers
+    async function getCustomersData () {
+        const { rows } = await db.query('SELECT * FROM customers')
+        const customersData = rows
+        return customersData
+    }
+    const customersData = await getCustomersData()
+
+    // Ambil Data Supplier berdasarkan Invoice
+    async function getCustomersDataINV (invoice) {
+        const { rows } = await db.query(`SELECT customers.name, customers.customerid 
+        FROM sales INNER JOIN customers 
+        ON sales.customer = customers.customerid 
+        WHERE invoice = $1`, [invoice])
+        const customersDataINV = rows[0]
+        return customersDataINV
+    }
+    const customersDataINV = await getCustomersDataINV(invoice)
+
+    
+    res.json({salesData, operator, goodsData, saleitems, customersData, customersDataINV})
+}
+
+exports.deleteAPIEditSales = async (req, res) => {
+    const { id } = req.params
+    const deleteData = await db.query('DELETE FROM saleitems WHERE id = $1', [id])
+    res.json({})
 }

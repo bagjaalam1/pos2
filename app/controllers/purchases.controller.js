@@ -226,8 +226,21 @@ exports.getAPIEditPurchases = async(req, res) => {
         return suppliersData
     }
     const suppliersData = await getSuppliersData()
+
+    // Ambil Data Supplier berdasarkan Invoice
+    async function getSuppliersDataINV (invoice) {
+        const { rows } = await db.query(`SELECT suppliers.name, suppliers.supplierid 
+        FROM purchases INNER JOIN suppliers 
+        ON purchases.supplier = suppliers.supplierid 
+        WHERE invoice = $1`, [invoice])
+        const suppliersDataINV = rows[0]
+        console.log(suppliersDataINV)
+        return suppliersDataINV
+    }
+    const suppliersDataINV = await getSuppliersDataINV(invoice)
+
     
-    res.json({purchasesData, operator, goodsData, purchaseitems, suppliersData})
+    res.json({purchasesData, operator, goodsData, purchaseitems, suppliersData, suppliersDataINV})
 }
 
 exports.getEditPurchases = async(req, res) => {
