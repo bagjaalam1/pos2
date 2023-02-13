@@ -17,8 +17,8 @@
                     <div class="col-sm-4">
                         <fieldset class="">
                             <label>Invoice</label>
-                            <input type="text" id="invoice" value="<%=invoice%>" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
-                                disabled>
+                            <input type="text" id="invoice" value="<%=invoice%>"
+                                class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
                         </fieldset>
                     </div>
                     <div class="col-sm-4">
@@ -201,10 +201,12 @@
                 method: "GET",
                 success: function (response) {
                     // value input sales
-                    const {time, totalsum } = response.salesData[0]
+                    const { time, totalsum, pay, change } = response.salesData[0]
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
                     $('#totalsumInput').val(formatter.format(totalsum))
+                    $('#payInput').val(formatRupiah((pay * 1).toString()))
+                    $('#changeInput').val(formatter.format(change))
 
                     // Value Input Goods
                     response.goodsData.forEach(function (item) {
@@ -253,7 +255,7 @@
                         });
                     });
 
-                    // Tampilkan Select Option Suppliers
+                    // Tampilkan Select Option Customers
                     const customersData = response.customersData
                     customersData.forEach(function (item) {
                         $('#select_customer').append($('<option>', {
@@ -267,7 +269,6 @@
                         value: customersDataINV.customerid,
                         text: customersDataINV.name,
                         selected: true,
-                        disabled: true
                     }))
                 }
             });
@@ -320,9 +321,14 @@
             $.ajax({
                 method: 'DELETE',
                 url: `http://localhost:3000/api/sales/edit/delete/${id}`,
-                data: {},
-                success: function(){
+                data: {invoice},
+                success: function (response) {
                     readDataSaleitems(invoice)
+                    const { totalsum, pay, change } = response.salesData[0]
+                    $('#totalsumInput').val(formatter.format(totalsum))
+                    $('#payInput').val(formatRupiah((pay * 1).toString()))
+                    $('#changeInput').val(formatter.format(change))
+                    console.log(totalsum, pay, change)
                 }
             })
                 .fail(function () {
@@ -376,6 +382,8 @@
                         type: "POST",
                         url: "http://localhost:3000/api/sales/add",
                         data: {
+                            pay: toNumber($('#payInput').val()),
+                            change: pemecahRupiah($('#changeInput').val()),
                             customerid: $('#select_customer').val(),
                             invoice: $('#invoice').val()
                         },
@@ -410,8 +418,11 @@
                         data: params,
                         success: function (response) {
                             updateSaleitems(response)
-                            const totalsum = response.totalsum
+                            const { totalsum, pay, change } = response.salesData[0]
                             $('#totalsumInput').val(formatter.format(totalsum))
+                            $('#payInput').val(formatRupiah((pay * 1).toString()))
+                            $('#changeInput').val(formatter.format(change))
+                            console.log(totalsum, pay, change)
                         }
                     });
                 }

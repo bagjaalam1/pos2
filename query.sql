@@ -2,10 +2,17 @@
 CREATE OR REPLACE FUNCTION update_purchase_total_sum()
 RETURNS TRIGGER AS $$
 BEGIN
+  IF (TG_OP = 'DELETE') THEN
+    UPDATE purchases
+    SET totalsum = totalsum - OLD.totalprice
+    WHERE invoice = OLD.invoice;
+    RETURN OLD;
+  ELSE
     UPDATE purchases
     SET totalsum = totalsum + NEW.totalprice
     WHERE invoice = NEW.invoice;
     RETURN NEW;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -135,14 +142,35 @@ EXECUTE FUNCTION update_goods_stock_penj();
 CREATE OR REPLACE FUNCTION update_sales_total_sum()
 RETURNS TRIGGER AS $$
 BEGIN
+  IF (TG_OP = 'DELETE') THEN
+    UPDATE sales
+    SET totalsum = totalsum - OLD.totalprice
+    WHERE invoice = OLD.invoice;
+    RETURN OLD;
+  ELSE
     UPDATE sales
     SET totalsum = totalsum + NEW.totalprice
     WHERE invoice = NEW.invoice;
     RETURN NEW;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_sales_total_sum_trigger
-AFTER INSERT ON saleitems
+AFTER INSERT OR DELETE ON saleitems
 FOR EACH ROW
 EXECUTE FUNCTION update_sales_total_sum();
+
+CREATE OR REPLACE FUNCTION update_sales_change()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.pay := NEW.pay - NEW.totalsum;
+  NEW.change := NEW.totalsum;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_sales_change_trigger
+AFTER INSERT OR UPDATE OF totalsum ON sales
+FOR EACH ROW
+EXECUTE FUNCTION update_sales_change();

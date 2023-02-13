@@ -177,15 +177,15 @@ exports.putAPIAddSales = async (req, res) => {
     }
     const saleitems = await getSaleitems(invoice)
 
-    // Ambil Data totalsum
-    async function getTotalsum () {
-        const { rows } = await db.query('SELECT totalsum FROM sales WHERE invoice = $1', [invoice])
-        const totalsum = rows
-        return totalsum
+    // Ambil Data salesData(totalsum, pay, change)
+    async function getSalesData () {
+        const { rows } = await db.query('SELECT totalsum, pay, change FROM sales WHERE invoice = $1', [invoice])
+        const salesData = rows
+        return salesData
     }
-    const totalsum = await getTotalsum(invoice)
+    const salesData = await getSalesData(invoice)
 
-    res.json({saleitems, totalsum: totalsum[0].totalsum})
+    res.json({saleitems, salesData})
 }
 
 exports.postAPIAddSales = async (req, res) => {
@@ -255,6 +255,15 @@ exports.getAPIEditSales = async(req, res) => {
 
 exports.deleteAPIEditSales = async (req, res) => {
     const { id } = req.params
+    const { invoice } = req.body
     const deleteData = await db.query('DELETE FROM saleitems WHERE id = $1', [id])
-    res.json({})
+
+    // Ambil Data salesData(totalsum, pay, change)
+    async function getSalesData () {
+        const { rows } = await db.query('SELECT totalsum, pay, change FROM sales WHERE invoice = $1', [invoice])
+        const salesData = rows
+        return salesData
+    }
+    const salesData = await getSalesData(invoice)
+    res.json({salesData})
 }

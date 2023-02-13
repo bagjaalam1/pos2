@@ -265,7 +265,6 @@
                     $('#invoice').val(invoice)
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
-                    const formattedTS = totalsum * 1
                     $('#totalsumInput').val(formatter.format(totalsum))
 
                     // Value Input Goods
@@ -345,7 +344,7 @@
                         type: "POST",
                         url: "http://localhost:3000/api/sales/add",
                         data: {
-                            pay: pemecahRupiah($('#payInput').val()),
+                            pay: toNumber($('#payInput').val()),
                             change: pemecahRupiah($('#changeInput').val()),
                             customerid: $('#select_customer').val(),
                             invoice: $('#invoice').val()
@@ -401,8 +400,10 @@
                         `);
                             }
 
-                            const totalsum = response.totalsum
-                            $('#totalsumInput').val(formatter.format(totalsum.toString()))
+                            const {totalsum, pay, change} = response
+                            $('#totalsumInput').val(formatter.format(totalsum))
+                            $('#payInput').val(formatter.format(pay))
+                            $('#changeInput').val(formatter.format(change))
                         }
                     });
                 }
