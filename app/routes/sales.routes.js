@@ -8,7 +8,7 @@ module.exports = (app) => {
     router.post('/sales', isLoggedIn, controller.postSales)
     router.get('/sales/add', isLoggedIn, controller.getAddSales)
     router.get('/sales/edit/:invoice', isLoggedIn, controller.getEditSales)
-    // router.get('/sales/delete/:invoice', isLoggedIn, controller.deletePurchases)
+    router.get('/sales/delete/:invoice', isLoggedIn, controller.deleteSales)
 
     app.use('/', router)
     return router;

@@ -161,16 +161,55 @@ AFTER INSERT OR DELETE ON saleitems
 FOR EACH ROW
 EXECUTE FUNCTION update_sales_total_sum();
 
+
+--buat update change setiap ada perubahan data di saleitems
 CREATE OR REPLACE FUNCTION update_sales_change()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.pay := NEW.pay - NEW.totalsum;
-  NEW.change := NEW.totalsum;
-  RETURN NEW;
+  IF (TG_OP = 'INSERT') THEN
+    UPDATE sales
+    SET change = pay - (SELECT SUM(totalprice) FROM saleitems WHERE invoice = NEW.invoice)
+    WHERE invoice = NEW.invoice;
+  ELSIF (TG_OP = 'DELETE') THEN
+    UPDATE sales
+    SET change = pay - (SELECT SUM(totalprice) FROM saleitems WHERE invoice = OLD.invoice)
+    WHERE invoice = OLD.invoice;
+  END IF;
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_sales_change_trigger
-AFTER INSERT OR UPDATE OF totalsum ON sales
+AFTER INSERT OR DELETE ON saleitems
 FOR EACH ROW
 EXECUTE FUNCTION update_sales_change();
+
+--update stock table goods kalau salah satu sales dihapus
+CREATE OR REPLACE FUNCTION return_goods_data_for_sales() 
+RETURNS TRIGGER 
+AS $$
+DECLARE
+    invoice_exists BOOLEAN;
+BEGIN
+    SELECT EXISTS (SELECT 1 
+                   FROM saleitems 
+                   WHERE invoice = OLD.invoice) 
+    INTO invoice_exists;
+    
+    IF invoice_exists THEN
+        UPDATE goods
+        SET stock = stock + saleitems.quantity
+        FROM saleitems
+        WHERE goods.barcode = saleitems.itemcode 
+        AND saleitems.invoice = OLD.invoice;
+    END IF;
+    
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER return_goods_data_for_sales_trigger 
+AFTER DELETE ON sales
+FOR EACH ROW 
+WHEN (TRUE)
+EXECUTE FUNCTION return_goods_data_for_sales();

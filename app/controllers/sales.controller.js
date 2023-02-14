@@ -267,3 +267,17 @@ exports.deleteAPIEditSales = async (req, res) => {
     const salesData = await getSalesData(invoice)
     res.json({salesData})
 }
+
+exports.deleteSales = async (req, res) => {
+    try {
+        const { invoice } = req.params
+
+        // Hapus Data dari Database
+        const deletePurchases = await db.query('DELETE FROM sales WHERE invoice = $1', [invoice])
+
+        res.redirect('/sales')
+    } catch (e) {
+        console.error(e);
+        res.send('Terjadi error!');
+    }
+}
