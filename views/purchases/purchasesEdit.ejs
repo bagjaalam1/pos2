@@ -244,20 +244,14 @@
 
                     // Tampilkan Select Option Suppliers
                     const suppliersData = response.suppliersData
+                    const suppliersDataINV = response.suppliersDataINV
                     suppliersData.forEach(function (item) {
                         $('#select_supplier').append($('<option>', {
                             value: item.supplierid,
                             text: item.name,
+                            selected: suppliersDataINV.name == item.name ? true : false
                         }));
                     });
-
-                    const suppliersDataINV = response.suppliersDataINV
-                    $('#select_supplier').prepend($('<option>', {
-                        value: suppliersDataINV.supplierid,
-                        text: suppliersDataINV.name,
-                        selected: true,
-                        disabled: true
-                    }))
                 }
             });
         }

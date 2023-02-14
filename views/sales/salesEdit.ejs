@@ -257,18 +257,19 @@
 
                     // Tampilkan Select Option Customers
                     const customersData = response.customersData
+                    const customersDataINV = response.customersDataINV
                     customersData.forEach(function (item) {
                         $('#select_customer').append($('<option>', {
                             value: item.customerid,
                             text: item.name,
+                            selected: customersDataINV.customerid == item.customerid ? true : false
                         }));
                     });
-
-                    const customersDataINV = response.customersDataINV
+                    
                     $('#select_customer').prepend($('<option>', {
-                        value: customersDataINV.customerid,
-                        text: customersDataINV.name,
-                        selected: true,
+                        value: '',
+                        text: 'none',
+                        selected: customersDataINV.customerid == null ? true : false
                     }))
                 }
             });
@@ -373,12 +374,7 @@
 
             // kirimkan Data Supplier ke Controller
             $("#finish").click(function () {
-                const customerid = $('#select_customer').val()
-                if (customerid == '' || customerid == null) {
-                    console.log('customerid kosong')
-                    //do nothing
-                } else {
-                    $.ajax({
+                $.ajax({
                         type: "POST",
                         url: "http://localhost:3000/api/sales/add",
                         data: {
@@ -391,7 +387,6 @@
                             window.location.href = '/sales'
                         }
                     });
-                }
 
             });
 

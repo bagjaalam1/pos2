@@ -75,15 +75,6 @@ exports.logout = (req, res) => {
     })
 }
 
-exports.dashboard = async (req, res) => {
-    try {
-        const user = req.session.user
-        res.render('dashboard', { name: user.name })
-    } catch (e) {
-        res.send(e)
-    }
-}
-
 exports.users = async (req, res) => {
     try {
         // Ambil data user dari session

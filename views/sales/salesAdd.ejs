@@ -335,12 +335,7 @@
             // kirimkan Data Customer ke Controller
             $("#finish").click(function (e) {
                 e.preventDefault()
-                const customerid = $('#select_customer').val()
-                if (customerid == '' || customerid == null) {
-                    console.log('customerid kosong')
-                    //do nothing
-                } else {
-                    $.ajax({
+                $.ajax({
                         type: "POST",
                         url: "http://localhost:3000/api/sales/add",
                         data: {
@@ -353,7 +348,6 @@
                             window.location.href = '/sales'
                         }
                     });
-                }
 
             });
 

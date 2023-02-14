@@ -47,7 +47,7 @@ exports.getSales = async (req, res) => {
         }
 
         // Query untuk menghitung total halaman
-        let sql = 'SELECT COUNT(sales.invoice) AS total FROM sales INNER JOIN customers ON sales.customer = customers.customerid';
+        let sql = 'SELECT COUNT(sales.invoice) AS total FROM sales LEFT JOIN customers ON sales.customer = customers.customerid';
         // Jika ada pencarian
         if (wheres.length > 0) {
             sql += ` WHERE ${wheres.join()}`;
@@ -60,7 +60,7 @@ exports.getSales = async (req, res) => {
         const pages = Math.ceil(totalResult.rows[0].total / limit);
 
         // Query untuk mengambil data
-        sql = 'SELECT sales.invoice, sales.time, sales.totalsum, sales.pay, sales.change, customers.name FROM sales INNER JOIN customers ON sales.customer = customers.customerid';
+        sql = 'SELECT sales.invoice, sales.time, sales.totalsum, sales.pay, sales.change, customers.name FROM sales LEFT JOIN customers ON sales.customer = customers.customerid';
         // Jika ada pencarian
         if (wheres.length > 0) {
             sql += ` WHERE ${wheres.join()}`;
@@ -70,6 +70,9 @@ exports.getSales = async (req, res) => {
 
         // Eksekusi query
         const { rows } = await db.query(sql, values);
+        console.log(sql)
+        console.log(values)
+        console.log(rows)
 
         // Render halaman
         res.render('./sales/sales', {
@@ -141,7 +144,7 @@ exports.getAPIAddSales = async(req, res) => {
     async function getSaleitems (invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
-        INNER JOIN goods ON saleitems.itemcode = goods.barcode
+        LEFT JOIN goods ON saleitems.itemcode = goods.barcode
         WHERE invoice = $1
         ORDER BY id ASC`, [invoice])
         const saleitems = rows
@@ -169,7 +172,7 @@ exports.putAPIAddSales = async (req, res) => {
     async function getSaleitems (invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
-        INNER JOIN goods ON saleitems.itemcode = goods.barcode
+        LEFT JOIN goods ON saleitems.itemcode = goods.barcode
         WHERE invoice = $1
         ORDER BY id ASC`, [invoice])
         const saleitems = rows
@@ -190,10 +193,11 @@ exports.putAPIAddSales = async (req, res) => {
 
 exports.postAPIAddSales = async (req, res) => {
     const { pay, change, customerid, invoice } = req.body
-
+    console.log(customerid)
+    const customeridNull = customerid == "" ? null : customerid
     // Tambahkan Data Supplier ke Table Purchase
     const addData = await db.query('UPDATE sales SET pay = $1, change = $2, customer = $3 WHERE invoice = $4', 
-    [pay, change, customerid, invoice])
+    [pay, change, customeridNull, invoice])
 
     res.redirect ('/sales')
 }
@@ -222,7 +226,7 @@ exports.getAPIEditSales = async(req, res) => {
     async function getSaleitems (invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
-        INNER JOIN goods ON saleitems.itemcode = goods.barcode
+        LEFT JOIN goods ON saleitems.itemcode = goods.barcode
         WHERE invoice = $1
         ORDER BY id ASC`, [invoice])
         const saleitems = rows
@@ -230,7 +234,7 @@ exports.getAPIEditSales = async(req, res) => {
     }
     const saleitems = await getSaleitems(invoice)
 
-    // Ambil Data Suppliers
+    // Ambil Data Customers
     async function getCustomersData () {
         const { rows } = await db.query('SELECT * FROM customers')
         const customersData = rows
@@ -238,10 +242,10 @@ exports.getAPIEditSales = async(req, res) => {
     }
     const customersData = await getCustomersData()
 
-    // Ambil Data Supplier berdasarkan Invoice
+    // Ambil Data Customer berdasarkan Invoice
     async function getCustomersDataINV (invoice) {
         const { rows } = await db.query(`SELECT customers.name, customers.customerid 
-        FROM sales INNER JOIN customers 
+        FROM sales LEFT JOIN customers 
         ON sales.customer = customers.customerid 
         WHERE invoice = $1`, [invoice])
         const customersDataINV = rows[0]

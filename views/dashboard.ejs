@@ -7,10 +7,362 @@
         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
     </div>
 
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Date Settings</h6>
+        </div>
+
+        <div class="card-body">
+            <form action="">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <fieldset class="">
+                            <label>Start Date</label>
+                            <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" id="date" name="startDate"
+                                value="">
+                        </fieldset>
+                    </div>
+                    <div class="col-sm-6">
+                        <fieldset>
+                            <label>End Date</label>
+                            <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" id="date" name="endDate"
+                                value="">
+                        </fieldset>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-footer">
+            <button type="submit" id="query" class="btn btn-success btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-check"></i>
+                </span>
+                <span class="text">Query</span>
+            </button>
+            <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
+                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </span>
+                <span class="text">Reset</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Earnings (Monthly)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Earnings (Annual)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                            </div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 50%"
+                                            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Requests</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area">
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
+                        </div>
+                        <canvas id="myAreaChart" width="777" height="320"
+                            style="display: block; width: 777px; height: 320px;"
+                            class="chartjs-render-monitor"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                            </div>
+                        </div>
+                        <canvas id="myPieChart" width="356" height="245"
+                            style="display: block; width: 356px; height: 245px;"
+                            class="chartjs-render-monitor"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Direct
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Social
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Referral
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Earnings Monthly Report</h6>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_length">
+                            <label class="d-flex"> Show
+                                <form method="get">
+                                    <select name="display" aria-controls="dataTable"
+                                        class="custom-select custom-select-sm form-control form-control-sm">
+                                        <option value="3">3</option>
+                                        <option value="10">10</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="sortBy" value="invoice">
+                                    <input type="hidden" name="sortMode" value="asc">
+                                    <input type="hidden" name="searchValue" value="">
+                                </form>entries
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_filter">
+                            <label class="d-flex">Search:
+                                <form action="" method="get">
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="sortBy" value="invoice">
+                                    <input type="hidden" name="sortMode" value="">
+                                    <input type="hidden" name="display" value="">
+                                    <input type="search" class="form-control form-control-sm" placeholder=""
+                                        aria-controls="dataTable" id="search" name="searchValue" value="">
+                                </form>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
+                            aria-describedby="dataTable_info">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a class="text-gray-800 text-decoration-none"
+                                            href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=desc&amp;searchValue=&amp;display=">
+                                            <i class="fas fa-sort-up"></i>
+                                            Monthly
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a class="text-gray-800 text-decoration-none"
+                                            href="/sales?page=1&amp;sortBy=time&amp;sortMode=desc&amp;searchValue=&amp;display=">
+                                            <i class="fas fa-sort"></i>
+                                            Expense
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a class="text-gray-800 text-decoration-none"
+                                            href="/sales?page=1&amp;sortBy=totalsum&amp;sortMode=desc&amp;searchValue=&amp;display=">
+                                            <i class="fas fa-sort"></i>
+                                            Revenue
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a class="text-gray-800 text-decoration-none"
+                                            href="/sales?page=1&amp;sortBy=pay&amp;sortMode=desc&amp;searchValue=&amp;display=">
+                                            <i class="fas fa-sort"></i>
+                                            Earning
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                <tr>
+                                    <td>
+                                        INV-PENJ20230212-3
+                                    </td>
+                                    <td id="time0">
+                                        12 Feb 2023 20:56:49
+                                    </td>
+                                    <td>
+                                        Rp&nbsp;1.312.312,00
+                                    </td>
+                                    <td>
+                                        Rp&nbsp;1.300.000,00
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th rowspan="1" colspan="1" class="text-gray-800">Total</th>
+                                    <th rowspan="1" colspan="1" class="text-gray-800">Jumlah</th>
+                                    <th rowspan="1" colspan="1" class="text-gray-800">Jumlah</th>
+                                    <th rowspan="1" colspan="1" class="text-gray-800">Jumlah</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">
+                            Showing 1 to 3 of 3
+                            entries
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-7">
+                        <div class="dataTables_paginate paging_simple_numbers text-right" id="dataTable_paginate">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item disabled">
+                                    <a class="page-link"
+                                        href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=asc&amp;searchValue=&amp;display=">Previous</a>
+                                </li>
+
+                                <li class="page-item active"><a class="page-link"
+                                        href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=asc&amp;searchValue=&amp;display=">
+                                        1
+                                    </a></li>
+
+                                <li class="page-item disabled">
+                                    <a class="page-link"
+                                        href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=asc&amp;searchValue=&amp;display=">Next</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
     <!-- /.container-fluid -->
 
     </div>
     <!-- End of Main Content -->
 
-<%- include('partials/footer.ejs') %>
+    <script>
+        $(document).ready(function () {
+            $('form').on('submit', function (e) {
+                e.preventDefault(); // menghentikan form dari submit ke halaman baru
+
+                var startDate = $('#date[name="startDate"]').val();
+                var endDate = $('#date[name="endDate"]').val();
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/api',
+                    data: { startDate: startDate, endDate: endDate },
+                    success: function (data) {
+                        // handle response dari controller jika ada
+                    }
+                });
+            });
+        });
+    </script>
+
+    <%- include('partials/footer.ejs') %>

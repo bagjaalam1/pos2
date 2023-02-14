@@ -38,6 +38,7 @@ require('./app/routes/purchasesAPI.routes')(app)
 require('./app/routes/customers.routes')(app)
 require('./app/routes/sales.routes')(app)
 require('./app/routes/salesAPI.routes')(app)
+require('./app/routes/dashboard.routes')(app)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
