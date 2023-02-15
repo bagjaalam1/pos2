@@ -7,47 +7,48 @@
         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Date Settings</h6>
-        </div>
-
-        <div class="card-body">
-            <form action="">
+    <form action="" id="dateForm">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Date Settings</h6>
+            </div>
+            <div class="card-body">
                 <div class="row">
                     <div class="col-sm-6">
                         <fieldset class="">
                             <label>Start Date</label>
-                            <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" id="date" name="startDate"
+                            <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" id="startDate" name="startDate"
                                 value="">
                         </fieldset>
                     </div>
                     <div class="col-sm-6">
                         <fieldset>
                             <label>End Date</label>
-                            <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" id="date" name="endDate"
+                            <input class="form-control mb-2 mr-sm-2 mb-sm-0" type="date" id="endDate" name="endDate"
                                 value="">
                         </fieldset>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <div class="card-footer">
-            <button type="submit" id="query" class="btn btn-success btn-icon-split">
-                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-check"></i>
-                </span>
-                <span class="text">Query</span>
-            </button>
-            <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
-                <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
-                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
-                </span>
-                <span class="text">Reset</span>
-            </a>
+            <div class="card-footer">
+                <button type="submit" id="query" class="btn btn-success btn-icon-split">
+                    <span class="icon text-white-50"
+                        style="display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">Query</span>
+                </button>
+                <a href="javascript:history.back()" class="btn btn-warning btn-icon-split">
+                    <span class="icon text-white-50"
+                        style="display: flex; align-items: center; justify-content: center;">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                    </span>
+                    <span class="text">Reset</span>
+                </a>
+            </div>
         </div>
-    </div>
+    </form>
 
     <div class="row">
 
@@ -211,8 +212,8 @@
                     <div class="col-sm-12 col-md-6">
                         <div class="dataTables_length">
                             <label class="d-flex"> Show
-                                <form method="get">
-                                    <select name="display" aria-controls="dataTable"
+                                <form method="get" id="">
+                                    <select name="display" aria-controls="dataTable" id="display"
                                         class="custom-select custom-select-sm form-control form-control-sm">
                                         <option value="3">3</option>
                                         <option value="10">10</option>
@@ -230,10 +231,6 @@
                         <div class="dataTables_filter">
                             <label class="d-flex">Search:
                                 <form action="" method="get">
-                                    <input type="hidden" name="page" value="1">
-                                    <input type="hidden" name="sortBy" value="invoice">
-                                    <input type="hidden" name="sortMode" value="">
-                                    <input type="hidden" name="display" value="">
                                     <input type="search" class="form-control form-control-sm" placeholder=""
                                         aria-controls="dataTable" id="search" name="searchValue" value="">
                                 </form>
@@ -279,22 +276,6 @@
                             </thead>
                             <tbody>
 
-
-                                <tr>
-                                    <td>
-                                        INV-PENJ20230212-3
-                                    </td>
-                                    <td id="time0">
-                                        12 Feb 2023 20:56:49
-                                    </td>
-                                    <td>
-                                        Rp&nbsp;1.312.312,00
-                                    </td>
-                                    <td>
-                                        Rp&nbsp;1.300.000,00
-                                    </td>
-                                </tr>
-
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -316,21 +297,8 @@
                     </div>
                     <div class="col-sm-12 col-md-7">
                         <div class="dataTables_paginate paging_simple_numbers text-right" id="dataTable_paginate">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item disabled">
-                                    <a class="page-link"
-                                        href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=asc&amp;searchValue=&amp;display=">Previous</a>
-                                </li>
+                            <ul class="pagination justify-content-end" id="pagination">
 
-                                <li class="page-item active"><a class="page-link"
-                                        href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=asc&amp;searchValue=&amp;display=">
-                                        1
-                                    </a></li>
-
-                                <li class="page-item disabled">
-                                    <a class="page-link"
-                                        href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=asc&amp;searchValue=&amp;display=">Next</a>
-                                </li>
                             </ul>
                         </div>
                     </div>
@@ -346,21 +314,102 @@
     <!-- End of Main Content -->
 
     <script>
+        moment.locale("id");
+        const formatter = IDRupiah()
+
+        var params = {
+            page: 1,
+            startDate: null,
+            endDate: null,
+        }
+
+        const readandPutData = () => {
+            $.ajax({
+                type: 'PUT',
+                url: '/api',
+                data: params,
+                success: function (response) {
+                    console.log(response)
+                    updateDataEarnings(response)
+                    pagination(response.page, response.pages)
+                }
+            });
+        }
+
+        const updateDataEarnings = (response) => {
+            let html = ''
+            response.rows.forEach(item => {
+                html += `
+                <tr>
+                    <td>
+                        ${moment.utc(item.month).format('MMM YY')}
+                    </td>
+                    <td id="time0">
+                        ${formatter.format(item.expense)}
+                    </td>
+                    <td>
+                        ${formatter.format(item.revenue)}
+                    </td>
+                    <td>
+                        ${formatter.format(item.revenue - item.expense)}
+                    </td>
+                </tr>
+                `
+            });
+            $('table tbody').html(html)
+        }
+
+        const pagination = (page, pages) => {
+            let pagination = `
+                    <li class="page-item" id="prev" datapage="${parseInt(page) - 1}">
+                        <button class="page-link prev-next"${page == 1 ? ' disabled' : ''}>
+                        Previous
+                        </button>
+                    </li>
+                    `
+            for (let i = 1; i <= pages; i++) {
+                pagination += `
+                        <li class="page-item${page == i ? ' active' : ''}" datapage="${i}">
+                            <button class="page-link">
+                            ${i}
+                            </button>
+                        </li>    
+                        `
+            }
+            pagination += `
+                    <li class="page-item" id="next" datapage="${parseInt(page) + 1}">
+                        <button class="page-link prev-next"${page == pages ? ' disabled' : ''}>
+                        Next
+                        </button>
+                    </li>
+                    `
+            const paginationNumbers = $('#pagination')
+            paginationNumbers.html(pagination)
+        }
+
         $(document).ready(function () {
-            $('form').on('submit', function (e) {
+            $('#dateForm').on('submit', function (e) {
                 e.preventDefault(); // menghentikan form dari submit ke halaman baru
 
-                var startDate = $('#date[name="startDate"]').val();
-                var endDate = $('#date[name="endDate"]').val();
+                const startDate = $('#startDate').val();
+                const endDate = $('#endDate').val();
+                params = { ...params, startDate, endDate }
+                readandPutData()
+            });
 
-                $.ajax({
-                    type: 'PUT',
-                    url: '/api',
-                    data: { startDate: startDate, endDate: endDate },
-                    success: function (data) {
-                        // handle response dari controller jika ada
-                    }
-                });
+            $('#pagination').on('click', '.page-item', function () {
+                const startDate = $('#startDate').val();
+                const endDate = $('#endDate').val();
+                const page = $(this).attr('datapage')
+                params = { ...params, startDate, endDate, page }
+
+                readandPutData()
+            })
+
+            $('#display').change(function () {
+                const display = $(this).val();
+                params = { ...params, display, page: 1 }
+                readandPutData()
             });
         });
     </script>
