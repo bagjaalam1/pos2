@@ -207,37 +207,37 @@
         </div>
 
         <div class="card-body">
-            <div class="table-responsive">
-                <div class="row">
-                    <div class="col-sm-12 col-md-6">
-                        <div class="dataTables_length">
-                            <label class="d-flex"> Show
-                                <form method="get" id="">
-                                    <select name="display" aria-controls="dataTable" id="display"
-                                        class="custom-select custom-select-sm form-control form-control-sm">
-                                        <option value="3">3</option>
-                                        <option value="10">10</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                    <input type="hidden" name="page" value="1">
-                                    <input type="hidden" name="sortBy" value="invoice">
-                                    <input type="hidden" name="sortMode" value="asc">
-                                    <input type="hidden" name="searchValue" value="">
-                                </form>entries
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-6">
-                        <div class="dataTables_filter">
-                            <label class="d-flex">Search:
-                                <form action="" method="get">
-                                    <input type="search" class="form-control form-control-sm" placeholder=""
-                                        aria-controls="dataTable" id="search" name="searchValue" value="">
-                                </form>
-                            </label>
-                        </div>
+
+            <div class="row">
+                <div class="col-sm-6 col-md-6">
+                    <div class="dataTables_length">
+                        <label class="d-flex"> Show
+                            <form method="get" id="">
+                                <select name="display" aria-controls="dataTable" id="display"
+                                    class="custom-select custom-select-sm form-control form-control-sm">
+                                    <option value="3">3</option>
+                                    <option value="10">10</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="sortBy" value="invoice">
+                                <input type="hidden" name="sortMode" value="asc">
+                                <input type="hidden" name="searchValue" value="">
+                            </form>entries
+                        </label>
                     </div>
                 </div>
+                <div class="col-sm-6 col-md-6">
+                    <div class="dataTables_filter">
+                        <label class="d-flex">Search:
+                            <input type="search" class="form-control form-control-sm" placeholder=""
+                                aria-controls="dataTable" id="search" name="searchValue" value="">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
                 <div class="row">
                     <div class="col-sm-12">
                         <table class="table table-bordered dataTable" width="100%" cellspacing="0" role="grid"
@@ -332,6 +332,7 @@
                     console.log(response)
                     updateDataEarnings(response)
                     pagination(response.page, response.pages)
+                    test(response)
                 }
             });
         }
@@ -342,7 +343,7 @@
                 html += `
                 <tr>
                     <td>
-                        ${moment.utc(item.month).format('MMM YY')}
+                        ${item.month}
                     </td>
                     <td id="time0">
                         ${formatter.format(item.expense)}
@@ -411,6 +412,13 @@
                 params = { ...params, display, page: 1 }
                 readandPutData()
             });
+
+            $('#search').keyup(function () {
+
+                const searchValue = $('#search').val()
+                params = { ...params, searchValue }
+                readandPutData()
+            })
         });
     </script>
 
