@@ -6,6 +6,7 @@ module.exports = (app) => {
     
 
     router.put('/', isLoggedIn, controller.putAPIDashboard)
+    router.put('/earnings', isLoggedIn, controller.putAPIEarningsData)
 
     app.use('/api', router)
     return router;

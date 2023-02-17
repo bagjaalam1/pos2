@@ -21,9 +21,6 @@ exports.putAPIDashboard = async (req, res) => {
 
     // Ambil data dari req.body
     const { searchValue, display, startDate, endDate } = req.body;
-    console.log(startDate)
-    console.log(endDate)
-    console.log(req.body)
 
     // Sorting
     const sortBy = req.body.sortBy || "TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY')"
@@ -71,59 +68,27 @@ exports.putAPIDashboard = async (req, res) => {
       values.push(searchValue, searchValue, searchValue);
     }
 
-    if(whereSearch.length > 0) {
+    if (whereSearch.length > 0) {
       searchClause += ` WHERE ${whereSearch.join()}`;
     }
 
-    console.log(whereClause)
     let sql = `
-        SELECT COUNT(*) AS total
-        FROM (
-          SELECT 
-            TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
-            s.revenue, 
-            p.expense
-          FROM (
-            SELECT 
-              TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
-              SUM(totalsum) AS revenue
-            FROM sales
-            ${whereClause}
-            GROUP BY sales_month
-          ) AS s
-          FULL OUTER JOIN (
-            SELECT 
-              TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS purchases_month, 
-              SUM(totalsum) AS expense
-            FROM purchases
-            ${whereClause}
-            GROUP BY purchases_month
-          ) AS p ON s.sales_month = p.purchases_month
-          ${searchClause}
-        ) AS result
-        `;
-
-    // Eksekusi query count
-    const totalResult = await db.query(sql, values);
-
-    // Hitung jumlah halaman
-    const pages = Math.ceil(totalResult.rows[0].total / limit);
-    console.log(pages)
-
-    console.log(whereClause)
-    // Query untuk mengambil data
-    sql = `
-        SELECT 
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 
         TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
-        s.revenue, 
-        p.expense
+        COALESCE(s.revenue, 0) AS revenue, 
+        COALESCE(p.expense, 0) AS expense,
+        COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning,
+        s.customer
       FROM (
         SELECT 
           TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
-          SUM(totalsum) AS revenue
+          SUM(totalsum) AS revenue,
+          customer
         FROM sales
         ${whereClause}
-        GROUP BY sales_month
+        GROUP BY sales_month, customer
       ) AS s
       FULL OUTER JOIN (
         SELECT 
@@ -134,6 +99,41 @@ exports.putAPIDashboard = async (req, res) => {
         GROUP BY purchases_month
       ) AS p ON s.sales_month = p.purchases_month
       ${searchClause}
+    ) AS result;
+        `;
+
+    // Eksekusi query count
+    const totalResult = await db.query(sql, values);
+
+    // Hitung jumlah halaman
+    const pages = Math.ceil(totalResult.rows[0].total / limit);
+
+    // Query untuk mengambil data
+    sql = `
+    SELECT 
+  TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
+  COALESCE(s.revenue, 0) AS revenue, 
+  COALESCE(p.expense, 0) AS expense,
+  COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning,
+  s.customer
+FROM (
+  SELECT 
+    TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
+    SUM(totalsum) AS revenue,
+    customer
+  FROM sales
+  ${whereClause}
+  GROUP BY sales_month, customer
+) AS s
+FULL OUTER JOIN (
+  SELECT 
+    TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS purchases_month, 
+    SUM(totalsum) AS expense
+  FROM purchases
+  ${whereClause}
+  GROUP BY purchases_month
+) AS p ON s.sales_month = p.purchases_month
+  ${searchClause}
         `;
 
     // Tambahkan limit, offset, sortby, dan sortmode
@@ -141,9 +141,6 @@ exports.putAPIDashboard = async (req, res) => {
 
     // Eksekusi query
     const { rows } = await db.query(sql, values);
-    console.log(sql)
-    console.log(values)
-    console.log(rows)
 
     // Render halaman
     res.json({
@@ -166,4 +163,89 @@ exports.putAPIDashboard = async (req, res) => {
     console.error(e)
     res.send(e)
   }
+}
+
+exports.putAPIEarningsData = async (req, res) => {
+  // Ambil data dari user session 
+  const { user } = req.session
+
+  // Ambil data dari req.body
+  const { searchValue, display, startDate, endDate } = req.body;
+
+  // Sorting
+  const sortBy = req.body.sortBy || "TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY')"
+  const sortMode = req.body.sortMode || 'ASC'
+
+  const wheres = [];
+  const whereSearch = [];
+  const values = [];
+  let whereClause = ''
+  let searchClause = ''
+  let count = 1
+
+  // jika input date dimasukkan
+  if (startDate && endDate) {
+    wheres.push(`time BETWEEN $${count++} AND $${count++}`)
+    values.push(startDate)
+    values.push(endDate)
+  } else if (startDate) {
+    wheres.push(`time >= $${count++}`)
+    values.push(startDate)
+  } else if (endDate) {
+    wheres.push(`time <= $${count++}`)
+    values.push(endDate)
+  }
+
+  // Jika tanggal dimasukkan
+  if (wheres.length > 0) {
+    whereClause += ` WHERE ${wheres.join()}`;
+  }
+
+  // Jika ada pencarian
+  if (searchValue) {
+    whereSearch.push(`
+      TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') ILIKE '%' || $${count++} || '%'
+      OR s.revenue::text ILIKE '%' || $${count++} || '%'
+      OR p.expense::text ILIKE '%' || $${count++} || '%'
+        `);
+    values.push(searchValue, searchValue, searchValue);
+  }
+
+  if (whereSearch.length > 0) {
+    searchClause += ` WHERE ${whereSearch.join()}`;
+  }
+
+  let sql = `
+  SELECT 
+  TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
+  COALESCE(s.revenue, 0) AS revenue, 
+  COALESCE(p.expense, 0) AS expense,
+  COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning,
+  s.customer
+  FROM (
+  SELECT 
+    TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
+    SUM(totalsum) AS revenue,
+    customer
+    FROM sales
+  ${whereClause}
+  GROUP BY sales_month, customer
+  ) AS s
+  FULL OUTER JOIN (
+  SELECT 
+    TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS purchases_month, 
+    SUM(totalsum) AS expense
+  FROM purchases
+  ${whereClause}
+  GROUP BY purchases_month
+  ) AS p ON s.sales_month = p.purchases_month
+    ${searchClause}
+  ORDER BY ${sortBy} ${sortMode}
+      `;
+
+  const { rows } = await db.query(sql, values);
+
+  res.json({
+    data: rows
+  })
 }

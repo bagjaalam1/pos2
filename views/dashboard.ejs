@@ -5,6 +5,8 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <a href="#" id="generate-report-button" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
     </div>
 
     <form action="" id="dateForm">
@@ -59,8 +61,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Earnings (Monthly)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                Purchases</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="text-purchases"></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -77,8 +79,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Earnings (Annual)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                Sales</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="text-sales"></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -94,17 +96,11 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Earnings
                             </div>
                             <div class="row no-gutters align-items-center">
                                 <div class="col-auto">
-                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                                </div>
-                                <div class="col">
-                                    <div class="progress progress-sm mr-2">
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 50%"
-                                            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800" id="text-earnings"></div>
                                 </div>
                             </div>
                         </div>
@@ -123,8 +119,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Requests</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                Total Sales</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="text-total-sales"></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -190,10 +186,7 @@
                             <i class="fas fa-circle text-primary"></i> Direct
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Social
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> Referral
+                            <i class="fas fa-circle text-success"></i> Customer
                         </span>
                     </div>
                 </div>
@@ -245,32 +238,21 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <a class="text-gray-800 text-decoration-none"
-                                            href="/sales?page=1&amp;sortBy=invoice&amp;sortMode=desc&amp;searchValue=&amp;display=">
-                                            <i class="fas fa-sort-up"></i>
-                                            Monthly
-                                        </a>
+                                        <a class="text-gray-800 text-decoration-none" href=""
+                                            datasort="TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY')"><i
+                                                class="fas fa-sort"></i> Monthly</a>
                                     </th>
                                     <th>
-                                        <a class="text-gray-800 text-decoration-none"
-                                            href="/sales?page=1&amp;sortBy=time&amp;sortMode=desc&amp;searchValue=&amp;display=">
-                                            <i class="fas fa-sort"></i>
-                                            Expense
-                                        </a>
+                                        <a class="text-gray-800 text-decoration-none" href="" datasort="p.expense"><i
+                                                class="fas fa-sort"></i> Expense</a>
                                     </th>
                                     <th>
-                                        <a class="text-gray-800 text-decoration-none"
-                                            href="/sales?page=1&amp;sortBy=totalsum&amp;sortMode=desc&amp;searchValue=&amp;display=">
-                                            <i class="fas fa-sort"></i>
-                                            Revenue
-                                        </a>
+                                        <a class="text-gray-800 text-decoration-none" href="" datasort="s.revenue"><i
+                                                class="fas fa-sort"></i> Revenue</a>
                                     </th>
                                     <th>
-                                        <a class="text-gray-800 text-decoration-none"
-                                            href="/sales?page=1&amp;sortBy=pay&amp;sortMode=desc&amp;searchValue=&amp;display=">
-                                            <i class="fas fa-sort"></i>
-                                            Earning
-                                        </a>
+                                        <a class="text-gray-800 text-decoration-none" href="" datasort="earning"><i
+                                                class="fas fa-sort"></i> Earning</a>
                                     </th>
                                 </tr>
                             </thead>
@@ -280,9 +262,10 @@
                             <tfoot>
                                 <tr>
                                     <th rowspan="1" colspan="1" class="text-gray-800">Total</th>
-                                    <th rowspan="1" colspan="1" class="text-gray-800">Jumlah</th>
-                                    <th rowspan="1" colspan="1" class="text-gray-800">Jumlah</th>
-                                    <th rowspan="1" colspan="1" class="text-gray-800">Jumlah</th>
+                                    <th rowspan="1" colspan="1" class="text-gray-800" id="text-total-expense"></th>
+                                    <th rowspan="1" colspan="1" class="text-gray-800" id="text-total-revenue"></th>
+                                    <th rowspan="1" colspan="1" class="text-gray-800" id="text-total-earnings">Jumlah
+                                    </th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -329,17 +312,35 @@
                 url: '/api',
                 data: params,
                 success: function (response) {
-                    console.log(response)
-                    updateDataEarnings(response)
+                    updateTableEarnings(response.rows)
                     pagination(response.page, response.pages)
-                    test(response)
+                    sort()
+                    updateDataCard(response.rows)
                 }
             });
         }
 
-        const updateDataEarnings = (response) => {
+        const updateDataCard = (rows) => {
+            const totalRevenue = rows.reduce((total, row) => {
+                const revenue = Number(row.revenue) || 0;
+                return total + revenue;
+            }, 0);
+            const totalExpense = rows.reduce((total, row) => {
+                const expense = Number(row.expense) || 0;
+                return total + expense;
+            }, 0);
+            const earnings = totalRevenue - totalExpense
+            const totalSales = rows.filter(row => row.revenue !== null).length;
+
+            $('#text-sales').html(formatter.format(totalRevenue))
+            $('#text-purchases').html(formatter.format(totalExpense))
+            $('#text-earnings').html(formatter.format(earnings))
+            $('#text-total-sales').html(totalSales)
+        }
+
+        const updateTableEarnings = (rows) => {
             let html = ''
-            response.rows.forEach(item => {
+            rows.forEach(item => {
                 html += `
                 <tr>
                     <td>
@@ -352,12 +353,26 @@
                         ${formatter.format(item.revenue)}
                     </td>
                     <td>
-                        ${formatter.format(item.revenue - item.expense)}
+                        ${formatter.format(item.earning)}
                     </td>
                 </tr>
                 `
             });
+
+            const totalRevenue = rows.reduce((total, row) => {
+                const revenue = Number(row.revenue) || 0;
+                return total + revenue;
+            }, 0);
+            const totalExpense = rows.reduce((total, row) => {
+                const expense = Number(row.expense) || 0;
+                return total + expense;
+            }, 0);
+            const earnings = totalRevenue - totalExpense
+
             $('table tbody').html(html)
+            $('#text-total-expense').text(formatter.format(totalExpense))
+            $('#text-total-revenue').text(formatter.format(totalRevenue))
+            $('#text-total-earnings').text(formatter.format(earnings))
         }
 
         const pagination = (page, pages) => {
@@ -388,14 +403,73 @@
             paginationNumbers.html(pagination)
         }
 
+        function downloadCSV(csv, filename) {
+            const csvFile = new Blob([csv], { type: 'text/csv' });
+            const downloadLink = $('<a></a>');
+            downloadLink.attr('href', window.URL.createObjectURL(csvFile));
+            downloadLink.attr('download', filename);
+            downloadLink.css('display', 'none');
+            $('body').append(downloadLink);
+            downloadLink[0].click();
+            downloadLink.remove(); // hapus anchor setelah file diunduh
+        }
+
+        function exportCSVFile(headers, rows, filename) {
+            let csv = '';
+            csv += headers.join(',') + '\n';
+            for (let row of rows) {
+                const values = [row.month, row.revenue, row.expense, row.earning].map(value => value === null ? 0 : value);
+                csv += values.join(',') + '\n';
+            }
+            downloadCSV(csv, filename);
+        }
+
+        function generateReport(rows) {
+            $('#generate-report-button').off('click').on('click', () => {
+                const headers = ['Month', 'Revenue', 'Expense', 'Earning'];
+                const filename = 'report.csv';
+                exportCSVFile(headers, rows, filename);
+            });
+        }
+
+        function getData() {
+            $.ajax({
+                type: 'PUT',
+                url: '/api/earnings',
+                data: params,
+                success: function (response) {
+                    generateReport(response.data)
+                    chartArea(response)
+                    chartPie(response)
+                }
+            });
+        }
+
+        function sort() {
+            $('th a i.fas').each(function (i, obj) {
+                if ($(this).parent().attr('datasort') == params.sortBy && params.sortMode == 'asc') {
+                    $(this).attr('class', `fas fa-sort-up`);
+                } else if ($(this).parent().attr('datasort') == params.sortBy && params.sortMode == 'desc') {
+                    $(this).attr('class', 'fas fa-sort-down');
+                } else {
+                    $(this).attr('class', 'fas fa-sort');
+                }
+            });
+        }
+
         $(document).ready(function () {
+            readandPutData()
+            getData()
+
             $('#dateForm').on('submit', function (e) {
                 e.preventDefault(); // menghentikan form dari submit ke halaman baru
 
                 const startDate = $('#startDate').val();
                 const endDate = $('#endDate').val();
-                params = { ...params, startDate, endDate }
+                const page = 1
+                params = { ...params, startDate, endDate, page }
                 readandPutData()
+                getData()
             });
 
             $('#pagination').on('click', '.page-item', function () {
@@ -419,6 +493,19 @@
                 params = { ...params, searchValue }
                 readandPutData()
             })
+
+            $("table.table").on("click", "th a", function (event) {
+                event.preventDefault()
+                const sortBy = $(this).attr("datasort")
+
+                if (params.sortBy != sortBy) {
+                    params.sortMode = 'asc'
+                } else {
+                    params.sortMode = params.sortMode == "asc" ? "desc" : "asc"
+                }
+                params = { ...params, sortBy }
+                readandPutData()
+            });
         });
     </script>
 
