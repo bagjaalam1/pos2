@@ -89,7 +89,7 @@ exports.users = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/users/' ||
-            req.url === '/users' ||
+                req.url === '/users' ||
                 req.url === `/users?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/users?display=${display}`
                 ? `/users?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -237,5 +237,89 @@ exports.deleteUser = async (req, res) => {
         res.redirect('/users')
     } catch (e) {
         res.send(e)
+    }
+}
+
+exports.getProfile = async (req, res) => {
+    try {
+        const user = req.session.user
+        console.log(req.session.user)
+
+        res.render('users/profile', { name: user.name, infoSuccess: req.flash('infoSuccess') })
+    } catch (e) {
+        res.send(e)
+    }
+}
+
+exports.postProfile = async (req, res) => {
+    try {
+        const { email, name } = req.body
+        const { userid } = req.session.user
+
+        // Add Supplier
+        const updateProfile = await db.query('UPDATE users SET email = $1, name = $2 WHERE userid = $3', [email, name, userid])
+
+        // Update req.session
+        const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email])
+        req.session.user = rows[0]
+
+        req.flash('infoSuccess', 'Your profile has been updated!')
+        res.redirect('/users/profile')
+    } catch (e) {
+        res.send(e)
+    }
+}
+
+exports.getChangepassword = async (req, res) => {
+    try {
+        const user = req.session.user
+
+        res.render('users/changepassword', { 
+            name: user.name, 
+            infoSuccess: req.flash('infoSuccess'), 
+            info: req.flash('info')
+        })
+    } catch (e) {
+        res.send(e)
+    }
+}
+
+exports.postChangepassword = async (req, res) => {
+    try {
+        const { oldpassword, newpassword, repassword } = req.body
+        const { password } = req.session.user
+        console.log(req.body)
+        console.log(password)
+
+        //Validasi old password
+        const match = await bcrypt.compare(oldpassword, password);
+        if (!match) {
+            throw 'Old Password is Wrong!'
+        }
+
+        // Validasi New Password
+        if(oldpassword === newpassword){
+            throw 'New password cannot be the same as the old password'
+        }
+
+        // Validasi retype password
+        if(repassword != newpassword) {
+            throw "Retype password doesn't match"
+        }
+
+        //hashing
+        const hash = bcrypt.hashSync(newpassword, saltRounds);
+
+        //update password
+        const updateUsers = await db.query('UPDATE users SET password = $1', [hash])
+
+        // update password di req.session
+        req.session.user.password = hash
+
+        req.flash('infoSuccess', "Your password has been updated")
+        res.redirect('/users/changepassword')
+    } catch (e) {
+        req.flash('info', e)
+        res.redirect('/users/changepassword')
     }
 }
