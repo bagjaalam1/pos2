@@ -3,7 +3,12 @@ const db = require('../models/index')
 exports.getUnits = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { user } = req.session
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -67,7 +72,8 @@ exports.getUnits = async (req, res) => {
 
         // Render halaman
         res.render('./units/units', {
-            name: user.name,
+            name,
+            role,
             rows,
             page,
             pages,
@@ -92,8 +98,14 @@ exports.getUnits = async (req, res) => {
 
 exports.getAddUnit = async (req, res) => {
     try {
-        const user = req.session.user
-        res.render('units/addUnit', { name: user.name, info: req.flash('info') })
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
+        
+        res.render('units/addUnit', { name, role, info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }
@@ -116,10 +128,16 @@ exports.addUnit = async (req, res) => {
 
 exports.getEditUnit = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
+
         const { unit } = req.params
         const { rows } = await db.query('SELECT * FROM units WHERE unit = $1', [unit])
-        res.render('units/editUnit.ejs', { name: user.name, item: rows[0], info: req.flash('info') })
+        res.render('units/editUnit.ejs', { name, role, item: rows[0], info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }

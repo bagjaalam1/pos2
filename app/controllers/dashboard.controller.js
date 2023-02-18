@@ -3,11 +3,15 @@ const moment = require('moment')
 
 exports.getDashboard = async (req, res) => {
   try {
-    const user = req.session.user
+    const { name, role } = req.session.user
 
+    // Validasi Role
+    if (role != 'admin') {
+      res.status(403).send('Forbidden');
+    }
 
+    res.render('dashboard', { name, role })
 
-    res.render('dashboard', { name: user.name })
   } catch (e) {
     res.send(e)
     console.error(e)

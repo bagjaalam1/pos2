@@ -5,7 +5,7 @@ const moment = require('moment')
 exports.getSales = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { user } = req.session
+        const { name, role } = req.session.user
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -76,7 +76,8 @@ exports.getSales = async (req, res) => {
 
         // Render halaman
         res.render('./sales/sales', {
-            name: user.name,
+            name,
+            role,
             rows,
             page,
             pages,
@@ -109,14 +110,14 @@ exports.postSales = async (req, res) => {
 }
 
 exports.getAddSales = async(req, res) => {
-    const { user } = req.session
-    res.render('./sales/salesAdd', {name: user.name})
+    const { name, role } = req.session.user
+    res.render('./sales/salesAdd', {name, role})
 }
 
 exports.getEditSales = async(req, res) => {
-    const { user } = req.session
+    const { name, role } = req.session.user
     const { invoice } = req.params
-    res.render('./sales/salesEdit', {name : user.name, invoice})
+    res.render('./sales/salesEdit', {name, role, invoice})
 }
 
 // API

@@ -25,7 +25,15 @@ exports.login = async (req, res) => {
         }
 
         req.session.user = rows[0]
-        res.redirect('/')
+        const { role } = req.session.user
+        
+        if(role == 'admin') {
+            res.redirect('/')
+        }
+
+        if(role == 'operator') {
+            res.redirect('/sales')
+        }
     } catch (e) {
         req.flash('info', e)
         res.redirect('login')
@@ -78,7 +86,13 @@ exports.logout = (req, res) => {
 exports.users = async (req, res) => {
     try {
         // Ambil data user dari session
-        const user = req.session.user;
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
+
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
 
@@ -140,7 +154,8 @@ exports.users = async (req, res) => {
 
         // Render halaman
         res.render('./users/users', {
-            name: user.name,
+            name,
+            role,
             rows,
             page,
             pages,
@@ -161,8 +176,14 @@ exports.users = async (req, res) => {
 
 exports.getAddUser = async (req, res) => {
     try {
-        const user = req.session.user
-        res.render('./users/addUser.ejs', { name: user.name, info: req.flash('info') })
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
+
+        res.render('./users/addUser.ejs', { name, role, info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }
@@ -194,10 +215,16 @@ exports.addUser = async (req, res) => {
 
 exports.getEditUser = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
+
         const { userid } = req.params
         const { rows } = await db.query('SELECT * FROM users WHERE userid = $1', [userid])
-        res.render('users/editUser.ejs', { name: user.name, item: rows[0], info: req.flash('info') })
+        res.render('users/editUser.ejs', { name, role, item: rows[0], info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }
@@ -242,10 +269,9 @@ exports.deleteUser = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = req.session.user
-        console.log(req.session.user)
+        const { name, role } = req.session.user
 
-        res.render('users/profile', { name: user.name, infoSuccess: req.flash('infoSuccess') })
+        res.render('users/profile', { name, role, infoSuccess: req.flash('infoSuccess') })
     } catch (e) {
         res.send(e)
     }
@@ -272,10 +298,11 @@ exports.postProfile = async (req, res) => {
 
 exports.getChangepassword = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
 
         res.render('users/changepassword', { 
-            name: user.name, 
+            name,
+            role, 
             infoSuccess: req.flash('infoSuccess'), 
             info: req.flash('info')
         })

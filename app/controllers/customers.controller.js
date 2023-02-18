@@ -3,7 +3,7 @@ const db = require('../models/index')
 exports.getCustomers = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { user } = req.session
+        const { name, role } = req.session.user
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -69,7 +69,8 @@ exports.getCustomers = async (req, res) => {
 
         // Render halaman
         res.render('./customers/customers', {
-            name: user.name,
+            name,
+            role,
             rows,
             page,
             pages,
@@ -92,9 +93,9 @@ exports.getCustomers = async (req, res) => {
 
 exports.getAddCustomers = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
 
-        res.render('customers/customersAdd', { name: user.name, info: req.flash('info') })
+        res.render('customers/customersAdd', { name, role, info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }
@@ -117,11 +118,11 @@ exports.addCustomers = async (req, res) => {
 
 exports.getEditCustomer = async (req, res) => {
     try {
-        const user = req.session.user
+        const {name, role} = req.session.user
         const { customerid } = req.params
         const { rows } = await db.query('SELECT * FROM customers WHERE customerid = $1', [customerid])
 
-        res.render('customers/customerEdit.ejs', { name: user.name, item: rows[0], info: req.flash('info') })
+        res.render('customers/customerEdit.ejs', { name, role, item: rows[0], info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }

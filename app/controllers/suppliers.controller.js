@@ -4,7 +4,7 @@ const path = require('path')
 exports.getSuppliers = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { user } = req.session
+        const { name, role } = req.session.user
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -70,7 +70,8 @@ exports.getSuppliers = async (req, res) => {
 
         // Render halaman
         res.render('./suppliers/suppliers', {
-            name: user.name,
+            name,
+            role,
             rows,
             page,
             pages,
@@ -95,9 +96,9 @@ exports.getSuppliers = async (req, res) => {
 
 exports.getAddSupplier = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
 
-        res.render('suppliers/addSuppliers', { name: user.name, info: req.flash('info') })
+        res.render('suppliers/addSuppliers', { name, role, info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }
@@ -119,11 +120,11 @@ exports.addSupplier = async (req, res) => {
 
 exports.getEditSupplier = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
         const { supplierid } = req.params
         const { rows } = await db.query('SELECT * FROM suppliers WHERE supplierid = $1', [supplierid])
 
-        res.render('suppliers/editSuppliers.ejs', { name: user.name, item: rows[0], info: req.flash('info') })
+        res.render('suppliers/editSuppliers.ejs', { name, role, item: rows[0], info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }

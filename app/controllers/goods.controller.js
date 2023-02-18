@@ -6,7 +6,12 @@ const fs = require('fs')
 exports.getGoods = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { user } = req.session
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -18,7 +23,7 @@ exports.getGoods = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/goods/' ||
-            req.url === '/goods' ||
+                req.url === '/goods' ||
                 req.url === `/goods?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/goods?display=${display}`
                 ? `/goods?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -74,7 +79,8 @@ exports.getGoods = async (req, res) => {
 
         // Render halaman
         res.render('./goods/goods', {
-            name: user.name,
+            name,
+            role,
             rows,
             page,
             pages,
@@ -99,12 +105,17 @@ exports.getGoods = async (req, res) => {
 
 exports.getAddGood = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
+
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
 
         // Ambil Data Units
         const { rows } = await db.query('SELECT unit FROM units')
 
-        res.render('goods/addGood', { name: user.name, info: req.flash('info'), rows })
+        res.render('goods/addGood', { name, role, info: req.flash('info'), rows })
     } catch (e) {
         res.send(e)
     }
@@ -169,7 +180,13 @@ exports.addGood = async (req, res) => {
 
 exports.getEditGoods = async (req, res) => {
     try {
-        const user = req.session.user
+        const { name, role } = req.session.user
+        
+        // Validasi Role
+        if (role != 'admin') {
+            res.status(403).send('Forbidden');
+        }
+
         const { barcode } = req.params
         const { rows } = await db.query('SELECT * FROM goods WHERE barcode = $1', [barcode])
 
@@ -184,7 +201,7 @@ exports.getEditGoods = async (req, res) => {
         // Ambil Data Gambar dari Lokal
         const img = path.join(__dirname, '..', '..', 'public', 'img', 'goodsImagesSaved')
 
-        res.render('goods/editGoods.ejs', { name: user.name, item: rows[0], info: req.flash('info'), unitData })
+        res.render('goods/editGoods.ejs', { name, role, item: rows[0], info: req.flash('info'), unitData })
     } catch (e) {
         res.send(e)
     }
