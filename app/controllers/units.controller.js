@@ -7,7 +7,7 @@ exports.getUnits = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         // Ambil data dari req.query
@@ -102,7 +102,7 @@ exports.getAddUnit = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
         
         res.render('units/addUnit', { name, role, info: req.flash('info') })
@@ -132,7 +132,7 @@ exports.getEditUnit = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         const { unit } = req.params

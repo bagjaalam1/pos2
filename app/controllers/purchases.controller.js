@@ -5,7 +5,7 @@ const moment = require('moment')
 exports.getPurchases = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { name, role } = req.session.user
+        const { name, role, userid } = req.session.user
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -58,7 +58,7 @@ exports.getPurchases = async (req, res) => {
         const pages = Math.ceil(totalResult.rows[0].total / limit);
 
         // Query untuk mengambil data
-        sql = 'SELECT purchases.invoice, purchases.time, purchases.totalsum, suppliers.name FROM purchases INNER JOIN suppliers ON purchases.supplier = suppliers.supplierid';
+        sql = 'SELECT purchases.invoice, purchases.time, purchases.totalsum, suppliers.name, purchases.operator FROM purchases INNER JOIN suppliers ON purchases.supplier = suppliers.supplierid';
         // Jika ada pencarian
         if (wheres.length > 0) {
             sql += ` WHERE ${wheres.join()}`;
@@ -73,6 +73,7 @@ exports.getPurchases = async (req, res) => {
         res.render('./purchases/purchases', {
             name,
             role,
+            userid,
             rows,
             page,
             pages,
@@ -189,8 +190,24 @@ exports.getAddPurchases = async (req, res) => {
 }
 
 exports.getAPIEditPurchases = async (req, res) => {
-    const { user } = req.session
+    const { userid, role } = req.session.user
     const { invoice } = req.params
+
+    if (role != 'admin') {
+        // Validasi invoice berdasarkan user
+        const { rows } = await db.query('SELECT invoice FROM purchases WHERE operator = $1', [userid])
+        let found = false;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].invoice === invoice) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return res.status(403).send('Forbidden');
+        }
+    }
 
     // Ambil Data Goods
     async function getGoodsData() {
@@ -235,13 +252,12 @@ exports.getAPIEditPurchases = async (req, res) => {
         ON purchases.supplier = suppliers.supplierid 
         WHERE invoice = $1`, [invoice])
         const suppliersDataINV = rows[0]
-        console.log(suppliersDataINV)
         return suppliersDataINV
     }
     const suppliersDataINV = await getSuppliersDataINV(invoice)
 
 
-    res.json({ purchasesData, operator: user, goodsData, purchaseitems, suppliersData, suppliersDataINV })
+    res.json({ purchasesData, operator: req.session.user, goodsData, purchaseitems, suppliersData, suppliersDataINV })
 }
 
 exports.getEditPurchases = async (req, res) => {
@@ -249,13 +265,33 @@ exports.getEditPurchases = async (req, res) => {
     const { invoice } = req.params
 
     if (role === 'admin') {
-        // Jika user adalah admin, maka abaikan semua validasi dan langsung render halaman purchasesEdit
+        // Jika user adalah admin, maka abaikan semua validasi
+        return res.render('./purchases/purchasesEdit', { name, role, invoice })
+    }
+    // Validasi invoice berdasarkan user
+    const { rows } = await db.query('SELECT invoice FROM purchases WHERE operator = $1', [userid])
+    let found = false;
+    for (let i = 0; i < rows.length; i++) {
+        if (rows[i].invoice === invoice) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
         res.render('./purchases/purchasesEdit', { name, role, invoice })
     } else {
+        res.status(403).send('Forbidden');
+    }
+}
+
+exports.deleteAPIEditPurchases = async (req, res) => {
+    const { role, userid } = req.session.user
+    const { invoice } = req.body
+    // Validasi Role
+    if (role != 'admin') {
         // Validasi invoice berdasarkan user
         const { rows } = await db.query('SELECT invoice FROM purchases WHERE operator = $1', [userid])
-        console.log(rows)
-
         let found = false;
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].invoice === invoice) {
@@ -264,17 +300,11 @@ exports.getEditPurchases = async (req, res) => {
             }
         }
 
-        if (found) {
-            // Melakukan tindakan yang diinginkan jika nilai invoice ditemukan
-            res.render('./purchases/purchasesEdit', { name, role, invoice })
-        } else {
-            // Mengirim respons Forbidden jika nilai invoice tidak ditemukan
-            res.status(403).send('Forbidden');
+        if (!found) {
+            return res.status(403).send('Forbidden');
         }
     }
-}
 
-exports.deleteAPIEditPurchases = async (req, res) => {
     const { id } = req.params
     const deletePurchaseitems = await db.query('DELETE FROM purchaseitems WHERE id = $1', [id])
     res.json({})
@@ -282,7 +312,24 @@ exports.deleteAPIEditPurchases = async (req, res) => {
 
 exports.deletePurchases = async (req, res) => {
     try {
+        const { role, userid } = req.session.user
         const { invoice } = req.params
+        // Validasi Role
+        if (role != 'admin') {
+            // Validasi invoice berdasarkan user
+            const { rows } = await db.query('SELECT invoice FROM purchases WHERE operator = $1', [userid])
+            let found = false;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].invoice === invoice) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                return res.status(403).send('Forbidden');
+            }
+        }
 
         // Hapus Data dari Database
         const deletePurchases = await db.query('DELETE FROM purchases WHERE invoice = $1', [invoice])

@@ -90,7 +90,7 @@ exports.users = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         // Ambil data dari req.query
@@ -180,7 +180,7 @@ exports.getAddUser = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         res.render('./users/addUser.ejs', { name, role, info: req.flash('info') })
@@ -219,7 +219,7 @@ exports.getEditUser = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         const { userid } = req.params

@@ -10,7 +10,7 @@ exports.getGoods = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         // Ambil data dari req.query
@@ -109,7 +109,7 @@ exports.getAddGood = async (req, res) => {
 
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         // Ambil Data Units
@@ -184,7 +184,7 @@ exports.getEditGoods = async (req, res) => {
         
         // Validasi Role
         if (role != 'admin') {
-            res.status(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
 
         const { barcode } = req.params

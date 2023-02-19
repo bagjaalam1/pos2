@@ -7,7 +7,7 @@ exports.getDashboard = async (req, res) => {
 
     // Validasi Role
     if (role != 'admin') {
-      res.status(403).send('Forbidden');
+      return res.status(403).send('Forbidden');
     }
 
     res.render('dashboard', { name, role })

@@ -5,7 +5,7 @@ const moment = require('moment')
 exports.getSales = async (req, res) => {
     try {
         // Ambil data dari user session 
-        const { name, role } = req.session.user
+        const { name, role, userid } = req.session.user
 
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
@@ -17,7 +17,7 @@ exports.getSales = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/sales/' ||
-            req.url === '/sales' ||
+                req.url === '/sales' ||
                 req.url === `/sales?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/sales?display=${display}`
                 ? `/sales?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -55,12 +55,12 @@ exports.getSales = async (req, res) => {
 
         // Eksekusi query
         const totalResult = await db.query(sql, values);
-        
+
         // Hitung jumlah halaman
         const pages = Math.ceil(totalResult.rows[0].total / limit);
 
         // Query untuk mengambil data
-        sql = 'SELECT sales.invoice, sales.time, sales.totalsum, sales.pay, sales.change, customers.name FROM sales LEFT JOIN customers ON sales.customer = customers.customerid';
+        sql = 'SELECT sales.invoice, sales.time, sales.totalsum, sales.pay, sales.change, customers.name, sales.operator FROM sales LEFT JOIN customers ON sales.customer = customers.customerid';
         // Jika ada pencarian
         if (wheres.length > 0) {
             sql += ` WHERE ${wheres.join()}`;
@@ -78,6 +78,7 @@ exports.getSales = async (req, res) => {
         res.render('./sales/sales', {
             name,
             role,
+            userid,
             rows,
             page,
             pages,
@@ -104,24 +105,40 @@ exports.getSales = async (req, res) => {
 
 exports.postSales = async (req, res) => {
     const operator = req.session.user.userid
-    const insert = await db.query('INSERT INTO sales(totalsum, pay, change, operator) VALUES($1, $2, $3, $4)', 
-    ['0', '0', '0', operator])
+    const insert = await db.query('INSERT INTO sales(totalsum, pay, change, operator) VALUES($1, $2, $3, $4)',
+        ['0', '0', '0', operator])
     res.redirect('/sales/add')
 }
 
-exports.getAddSales = async(req, res) => {
+exports.getAddSales = async (req, res) => {
     const { name, role } = req.session.user
-    res.render('./sales/salesAdd', {name, role})
+    res.render('./sales/salesAdd', { name, role })
 }
 
-exports.getEditSales = async(req, res) => {
-    const { name, role } = req.session.user
+exports.getEditSales = async (req, res) => {
+    const { name, role, userid } = req.session.user
     const { invoice } = req.params
-    res.render('./sales/salesEdit', {name, role, invoice})
+    if (role != 'admin') {
+        // Validasi invoice berdasarkan user
+        const { rows } = await db.query('SELECT invoice FROM sales WHERE operator = $1', [userid])
+        let found = false;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].invoice === invoice) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return res.status(403).send('Forbidden');
+        }
+    }
+
+    res.render('./sales/salesEdit', { name, role, invoice })
 }
 
 // API
-exports.getAPIAddSales = async(req, res) => {
+exports.getAPIAddSales = async (req, res) => {
     const operator = req.session.user
 
     // Ambil Data Goods
@@ -131,7 +148,7 @@ exports.getAPIAddSales = async(req, res) => {
         return goodsData
     }
     const goodsData = await getGoodsData()
-    
+
     // ambil data sales terbaru
     async function getSalesData() {
         const { rows } = await db.query('SELECT * FROM sales ORDER BY time ASC')
@@ -140,9 +157,9 @@ exports.getAPIAddSales = async(req, res) => {
     }
     const salesData = await getSalesData()
     const invoice = salesData.invoice
-    
+
     // Ambil Data saleitems & nama barang berdasarkan invoice
-    async function getSaleitems (invoice) {
+    async function getSaleitems(invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
         LEFT JOIN goods ON saleitems.itemcode = goods.barcode
@@ -154,14 +171,14 @@ exports.getAPIAddSales = async(req, res) => {
     const saleitems = await getSaleitems(invoice)
 
     // Ambil Data Customers
-    async function getCustomersData () {
+    async function getCustomersData() {
         const { rows } = await db.query('SELECT * FROM customers')
         const customersData = rows
         return customersData
     }
     const customersData = await getCustomersData()
-    
-    res.json({salesData, operator, goodsData, saleitems, customersData})
+
+    res.json({ salesData, operator, goodsData, saleitems, customersData })
 }
 
 exports.putAPIAddSales = async (req, res) => {
@@ -170,7 +187,7 @@ exports.putAPIAddSales = async (req, res) => {
     const addPurchaseitems = await db.query('INSERT INTO saleitems(invoice, itemcode, quantity, sellingprice, totalprice) VALUES ($1, $2, $3, $4, $5)', [invoice, barcode, quantity, sellingPriceNumber, totalPriceNumber])
 
     // Ambil Data saleitems & nama barang berdasarkan invoice
-    async function getSaleitems (invoice) {
+    async function getSaleitems(invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
         LEFT JOIN goods ON saleitems.itemcode = goods.barcode
@@ -182,14 +199,14 @@ exports.putAPIAddSales = async (req, res) => {
     const saleitems = await getSaleitems(invoice)
 
     // Ambil Data salesData(totalsum, pay, change)
-    async function getSalesData () {
+    async function getSalesData() {
         const { rows } = await db.query('SELECT totalsum, pay, change FROM sales WHERE invoice = $1', [invoice])
         const salesData = rows
         return salesData
     }
     const salesData = await getSalesData(invoice)
 
-    res.json({saleitems, salesData})
+    res.json({ saleitems, salesData })
 }
 
 exports.postAPIAddSales = async (req, res) => {
@@ -197,15 +214,31 @@ exports.postAPIAddSales = async (req, res) => {
     console.log(customerid)
     const customeridNull = customerid == "" ? null : customerid
     // Tambahkan Data Supplier ke Table Purchase
-    const addData = await db.query('UPDATE sales SET pay = $1, change = $2, customer = $3 WHERE invoice = $4', 
-    [pay, change, customeridNull, invoice])
+    const addData = await db.query('UPDATE sales SET pay = $1, change = $2, customer = $3 WHERE invoice = $4',
+        [pay, change, customeridNull, invoice])
 
-    res.redirect ('/sales')
+    res.redirect('/sales')
 }
 
-exports.getAPIEditSales = async(req, res) => {
-    const operator = req.session.user
+exports.getAPIEditSales = async (req, res) => {
+    const { role, userid } = req.session.user
     const { invoice } = req.params
+
+    if (role != 'admin') {
+        // Validasi invoice berdasarkan user
+        const { rows } = await db.query('SELECT invoice FROM sales WHERE operator = $1', [userid])
+        let found = false;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].invoice === invoice) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return res.status(403).send('Forbidden');
+        }
+    }
 
     // Ambil Data Goods
     async function getGoodsData() {
@@ -214,7 +247,7 @@ exports.getAPIEditSales = async(req, res) => {
         return goodsData
     }
     const goodsData = await getGoodsData()
-    
+
     // ambil data sales terbaru berdasarkan invoice
     async function getSalesData(invoice) {
         const { rows } = await db.query('SELECT * FROM sales WHERE invoice = $1', [invoice])
@@ -222,9 +255,9 @@ exports.getAPIEditSales = async(req, res) => {
         return salesData
     }
     const salesData = await getSalesData(invoice)
-    
+
     // Ambil Data saleitems & nama barang berdasarkan invoice
-    async function getSaleitems (invoice) {
+    async function getSaleitems(invoice) {
         const { rows } = await db.query(`SELECT saleitems.id, saleitems.itemcode, goods.name, quantity, saleitems.sellingprice, totalprice
         FROM saleitems
         LEFT JOIN goods ON saleitems.itemcode = goods.barcode
@@ -236,7 +269,7 @@ exports.getAPIEditSales = async(req, res) => {
     const saleitems = await getSaleitems(invoice)
 
     // Ambil Data Customers
-    async function getCustomersData () {
+    async function getCustomersData() {
         const { rows } = await db.query('SELECT * FROM customers')
         const customersData = rows
         return customersData
@@ -244,7 +277,7 @@ exports.getAPIEditSales = async(req, res) => {
     const customersData = await getCustomersData()
 
     // Ambil Data Customer berdasarkan Invoice
-    async function getCustomersDataINV (invoice) {
+    async function getCustomersDataINV(invoice) {
         const { rows } = await db.query(`SELECT customers.name, customers.customerid 
         FROM sales LEFT JOIN customers 
         ON sales.customer = customers.customerid 
@@ -254,28 +287,63 @@ exports.getAPIEditSales = async(req, res) => {
     }
     const customersDataINV = await getCustomersDataINV(invoice)
 
-    
-    res.json({salesData, operator, goodsData, saleitems, customersData, customersDataINV})
+
+    res.json({ salesData, operator: req.session.user, goodsData, saleitems, customersData, customersDataINV })
 }
 
 exports.deleteAPIEditSales = async (req, res) => {
+    const { role, userid } = req.session.user
     const { id } = req.params
     const { invoice } = req.body
+
+    if (role != 'admin') {
+        // Validasi invoice berdasarkan user
+        const { rows } = await db.query('SELECT invoice FROM sales WHERE operator = $1', [userid])
+        let found = false;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].invoice === invoice) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return res.status(403).send('Forbidden');
+        }
+    }
+
     const deleteData = await db.query('DELETE FROM saleitems WHERE id = $1', [id])
 
     // Ambil Data salesData(totalsum, pay, change)
-    async function getSalesData () {
+    async function getSalesData() {
         const { rows } = await db.query('SELECT totalsum, pay, change FROM sales WHERE invoice = $1', [invoice])
         const salesData = rows
         return salesData
     }
     const salesData = await getSalesData(invoice)
-    res.json({salesData})
+    res.json({ salesData })
 }
 
 exports.deleteSales = async (req, res) => {
     try {
+        const { role, userid } = req.session.user
         const { invoice } = req.params
+
+        if (role != 'admin') {
+            // Validasi invoice berdasarkan user
+            const { rows } = await db.query('SELECT invoice FROM sales WHERE operator = $1', [userid])
+            let found = false;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].invoice === invoice) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                return res.status(403).send('Forbidden');
+            }
+        }
 
         // Hapus Data dari Database
         const deletePurchases = await db.query('DELETE FROM sales WHERE invoice = $1', [invoice])

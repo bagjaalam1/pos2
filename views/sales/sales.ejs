@@ -148,11 +148,11 @@
                                                 </td>   
                                                 <td>
                                                     <a href="/sales/edit/<%=item.invoice%>"
-                                                        class="btn btn-success btn-circle">
+                                                        class="btn btn-success btn-circle <%=item.operator == userid ? '' : 'disabled'%>">
                                                         <i class="fas fa-info-circle"></i>
                                                     </a>
                                                     <a href="/sales/delete/<%=item.invoice%>"
-                                                        class="btn btn-danger btn-circle" data-toggle="modal"
+                                                        class="btn btn-danger btn-circle <%=item.operator == userid ? '' : 'disabled'%>" data-toggle="modal"
                                                         data-target="#deleteModal<%=index%>">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
