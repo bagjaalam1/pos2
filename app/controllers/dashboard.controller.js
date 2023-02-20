@@ -10,7 +10,13 @@ exports.getDashboard = async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
-    res.render('dashboard', { name, role })
+    let goodsAlert = null
+    if (role == 'admin') {
+      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+      goodsAlert = goods.rows
+    }
+    
+    res.render('dashboard', { name, role, goodsAlert })
 
   } catch (e) {
     res.send(e)

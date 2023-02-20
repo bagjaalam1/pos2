@@ -1,10 +1,10 @@
-<title>POS - Suppliers</title>
+<title>POS - Purchases</title>
 
 <%- include('../partials/header.ejs') %>
 
     <!-- Page Heading -->
     <div class="align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-1 text-gray-800">Suppliers</h1>
+        <h1 class="h3 mb-1 text-gray-800">Purchases</h1>
         <p class="text-gray-800">This is data of Purchase</p>
     </div>
 
@@ -17,14 +17,13 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
 
-                    <form method="post">
-                        <button class="btn btn-primary btn-icon-split">
-                          <span class="icon text-white-50" style="display: flex; align-items: center; justify-content: center;">
+                    <a href="/purchases/add" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50"
+                            style="display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-plus"></i>
-                          </span>
-                          <span class="text">Add</span>
-                        </button>
-                    </form>
+                        </span>
+                        <span class="text">Add</span>
+                    </a>
 
                 </div>
 
@@ -55,7 +54,7 @@
                                         <form action="" method="get">
                                             <input type="hidden" name="page" value="1">
                                             <input type="hidden" name="sortBy" value="<%=sortBy%>">
-                                            <input type="hidden" name="sortMode" value="<%sortMode%>">
+                                            <input type="hidden" name="sortMode" value="<%=sortMode%>">
                                             <input type="hidden" name="display" value="<%=display%>">
                                             <input type="search" class="form-control form-control-sm" placeholder=""
                                                 aria-controls="dataTable" id="search" name="searchValue"
@@ -116,22 +115,22 @@
                                                     <%= item.invoice %>
                                                 </td>
                                                 <td id="time<%=index%>">
-                                                    <%= moment(item.time, "ddd MMM DD YYYY HH:mm:ss ZZ").format('DD MMM YYYY HH:mm:ss') %>
+                                                    <%= moment(item.time, "ddd MMM DD YYYY HH:mm:ss ZZ" ).format('DD MMMYYYY HH:mm:ss') %>
                                                 </td>
                                                 <td>
                                                     <%= IDRupiah.format(item.totalsum) %>
                                                 </td>
                                                 <td>
                                                     <%= item.name %>
-                                                </td>   
+                                                </td>
                                                 <td>
                                                     <a href="/purchases/edit/<%=item.invoice%>"
-                                                        class="btn btn-success btn-circle <%=item.operator == userid ? '' : 'disabled'%>">
+                                                        class="btn btn-success btn-circle <% if (role != 'admin') { %> <%=item.operator == userid ? '' : 'disabled'%> <% } %>">
                                                         <i class="fas fa-info-circle"></i>
                                                     </a>
                                                     <a href="/purchases/delete/<%=item.invoice%>"
-                                                        class="btn btn-danger btn-circle <%=item.operator == userid ? '' : 'disabled'%>" data-toggle="modal"
-                                                        data-target="#deleteModal<%=index%>">
+                                                        class="btn btn-danger btn-circle <% if (role != 'admin') { %> <%=item.operator == userid ? '' : 'disabled'%> <% } %>"
+                                                        data-toggle="modal" data-target="#deleteModal<%=index%>">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 </td>

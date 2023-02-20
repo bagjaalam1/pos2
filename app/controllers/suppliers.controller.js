@@ -16,7 +16,7 @@ exports.getSuppliers = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/suppliers' ||
-            req.url === '/suppliers/' ||
+                req.url === '/suppliers/' ||
                 req.url === `/suppliers?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/suppliers?display=${display}`
                 ? `/suppliers?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -68,10 +68,18 @@ exports.getSuppliers = async (req, res) => {
         // Eksekusi query
         const { rows } = await db.query(sql, values);
 
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
         // Render halaman
         res.render('./suppliers/suppliers', {
             name,
             role,
+            goodsAlert,
             rows,
             page,
             pages,
@@ -98,7 +106,14 @@ exports.getAddSupplier = async (req, res) => {
     try {
         const { name, role } = req.session.user
 
-        res.render('suppliers/addSuppliers', { name, role, info: req.flash('info') })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('suppliers/addSuppliers', { name, role, info: req.flash('info'), goodsAlert })
     } catch (e) {
         res.send(e)
     }
@@ -124,7 +139,14 @@ exports.getEditSupplier = async (req, res) => {
         const { supplierid } = req.params
         const { rows } = await db.query('SELECT * FROM suppliers WHERE supplierid = $1', [supplierid])
 
-        res.render('suppliers/editSuppliers.ejs', { name, role, item: rows[0], info: req.flash('info') })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('suppliers/editSuppliers.ejs', { name, role, item: rows[0], info: req.flash('info'), goodsAlert })
     } catch (e) {
         res.send(e)
     }

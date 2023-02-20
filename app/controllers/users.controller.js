@@ -26,12 +26,12 @@ exports.login = async (req, res) => {
 
         req.session.user = rows[0]
         const { role } = req.session.user
-        
-        if(role == 'admin') {
+
+        if (role == 'admin') {
             res.redirect('/')
         }
 
-        if(role == 'operator') {
+        if (role == 'operator') {
             res.redirect('/sales')
         }
     } catch (e) {
@@ -152,10 +152,18 @@ exports.users = async (req, res) => {
         // Eksekusi query
         const { rows } = await db.query(sql, values);
 
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
         // Render halaman
         res.render('./users/users', {
             name,
             role,
+            goodsAlert,
             rows,
             page,
             pages,
@@ -183,7 +191,14 @@ exports.getAddUser = async (req, res) => {
             return res.status(403).send('Forbidden');
         }
 
-        res.render('./users/addUser.ejs', { name, role, info: req.flash('info') })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('./users/addUser.ejs', { name, role, info: req.flash('info'), goodsAlert })
     } catch (e) {
         res.send(e)
     }
@@ -224,7 +239,15 @@ exports.getEditUser = async (req, res) => {
 
         const { userid } = req.params
         const { rows } = await db.query('SELECT * FROM users WHERE userid = $1', [userid])
-        res.render('users/editUser.ejs', { name, role, item: rows[0], info: req.flash('info') })
+
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('users/editUser.ejs', { name, role, item: rows[0], info: req.flash('info'), goodsAlert })
     } catch (e) {
         res.send(e)
     }
@@ -271,7 +294,14 @@ exports.getProfile = async (req, res) => {
     try {
         const { name, role } = req.session.user
 
-        res.render('users/profile', { name, role, infoSuccess: req.flash('infoSuccess') })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('users/profile', { name, role, infoSuccess: req.flash('infoSuccess'), goodsAlert })
     } catch (e) {
         res.send(e)
     }
@@ -300,10 +330,18 @@ exports.getChangepassword = async (req, res) => {
     try {
         const { name, role } = req.session.user
 
-        res.render('users/changepassword', { 
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('users/changepassword', {
             name,
-            role, 
-            infoSuccess: req.flash('infoSuccess'), 
+            role,
+            goodsAlert,
+            infoSuccess: req.flash('infoSuccess'),
             info: req.flash('info')
         })
     } catch (e) {
@@ -325,12 +363,12 @@ exports.postChangepassword = async (req, res) => {
         }
 
         // Validasi New Password
-        if(oldpassword === newpassword){
+        if (oldpassword === newpassword) {
             throw 'New password cannot be the same as the old password'
         }
 
         // Validasi retype password
-        if(repassword != newpassword) {
+        if (repassword != newpassword) {
             throw "Retype password doesn't match"
         }
 

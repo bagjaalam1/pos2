@@ -70,14 +70,19 @@ exports.getSales = async (req, res) => {
 
         // Eksekusi query
         const { rows } = await db.query(sql, values);
-        console.log(sql)
-        console.log(values)
-        console.log(rows)
+
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
 
         // Render halaman
         res.render('./sales/sales', {
             name,
             role,
+            goodsAlert,
             userid,
             rows,
             page,
@@ -112,7 +117,15 @@ exports.postSales = async (req, res) => {
 
 exports.getAddSales = async (req, res) => {
     const { name, role } = req.session.user
-    res.render('./sales/salesAdd', { name, role })
+
+    // Ambil data untuk alerts
+    let goodsAlert = null
+    if (role == 'admin') {
+      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+      goodsAlert = goods.rows
+    }
+
+    res.render('./sales/salesAdd', { name, role, goodsAlert })
 }
 
 exports.getEditSales = async (req, res) => {
@@ -134,7 +147,14 @@ exports.getEditSales = async (req, res) => {
         }
     }
 
-    res.render('./sales/salesEdit', { name, role, invoice })
+    // Ambil data untuk alerts
+    let goodsAlert = null
+    if (role == 'admin') {
+      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+      goodsAlert = goods.rows
+    }
+
+    res.render('./sales/salesEdit', { name, role, invoice, goodsAlert })
 }
 
 // API

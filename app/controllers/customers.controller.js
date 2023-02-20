@@ -15,7 +15,7 @@ exports.getCustomers = async (req, res) => {
         // URL saat ini
         const url =
             req.url === '/customers/' ||
-            req.url === '/customers' ||
+                req.url === '/customers' ||
                 req.url === `/customers?searchValue=${searchValue}&display=${display}` ||
                 req.url === `/customers?display=${display}`
                 ? `/customers?page=1&sortBy=${sortBy}&sortMode=${sortMode}&searchValue=${searchValue || ''}&display=${display || ''}`
@@ -67,10 +67,18 @@ exports.getCustomers = async (req, res) => {
         // Eksekusi query
         const { rows } = await db.query(sql, values);
 
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
         // Render halaman
         res.render('./customers/customers', {
             name,
             role,
+            goodsAlert,
             rows,
             page,
             pages,
@@ -95,7 +103,14 @@ exports.getAddCustomers = async (req, res) => {
     try {
         const { name, role } = req.session.user
 
-        res.render('customers/customersAdd', { name, role, info: req.flash('info') })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('customers/customersAdd', { name, role, goodsAlert, info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }
@@ -118,11 +133,18 @@ exports.addCustomers = async (req, res) => {
 
 exports.getEditCustomer = async (req, res) => {
     try {
-        const {name, role} = req.session.user
+        const { name, role } = req.session.user
         const { customerid } = req.params
         const { rows } = await db.query('SELECT * FROM customers WHERE customerid = $1', [customerid])
 
-        res.render('customers/customerEdit.ejs', { name, role, item: rows[0], info: req.flash('info') })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('customers/customerEdit.ejs', { name, role, goodsAlert, item: rows[0], info: req.flash('info') })
     } catch (e) {
         res.send(e)
     }

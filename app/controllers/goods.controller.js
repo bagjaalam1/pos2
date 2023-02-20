@@ -77,10 +77,18 @@ exports.getGoods = async (req, res) => {
         // Eksekusi query
         const { rows } = await db.query(sql, values);
 
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
         // Render halaman
         res.render('./goods/goods', {
             name,
             role,
+            goodsAlert,
             rows,
             page,
             pages,
@@ -115,7 +123,14 @@ exports.getAddGood = async (req, res) => {
         // Ambil Data Units
         const { rows } = await db.query('SELECT unit FROM units')
 
-        res.render('goods/addGood', { name, role, info: req.flash('info'), rows })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('goods/addGood', { name, role, goodsAlert, info: req.flash('info'), rows })
     } catch (e) {
         res.send(e)
     }
@@ -181,7 +196,7 @@ exports.addGood = async (req, res) => {
 exports.getEditGoods = async (req, res) => {
     try {
         const { name, role } = req.session.user
-        
+
         // Validasi Role
         if (role != 'admin') {
             return res.status(403).send('Forbidden');
@@ -201,7 +216,14 @@ exports.getEditGoods = async (req, res) => {
         // Ambil Data Gambar dari Lokal
         const img = path.join(__dirname, '..', '..', 'public', 'img', 'goodsImagesSaved')
 
-        res.render('goods/editGoods.ejs', { name, role, item: rows[0], info: req.flash('info'), unitData })
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
+        res.render('goods/editGoods.ejs', { name, role, goodsAlert, item: rows[0], info: req.flash('info'), unitData })
     } catch (e) {
         res.send(e)
     }

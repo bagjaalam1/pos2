@@ -167,24 +167,35 @@
 
     <script>
         moment.locale("id")
+        var params = {
 
-        function readDataPurchaseitems() {
+        }
 
+        function readData() {
             $.ajax({
                 url: "http://localhost:3000/api/purchases/add",
                 method: "GET",
                 success: function (response) {
-                    $('#purchaseitemsTableBody').empty();
-                    const purchaseitems = response.purchaseitems;
-                    for (let i = 0; i < purchaseitems.length; i++) {
-                        const itemcode = purchaseitems[i].itemcode;
-                        const name = purchaseitems[i].name;
-                        const quantity = purchaseitems[i].quantity;
-                        const purchaseprice = purchaseitems[i].purchaseprice;
-                        const toFormatPP = purchaseprice * 1
-                        const totalprice = purchaseitems[i].totalprice;
-                        const toFormatTP = totalprice * 1
-                        $('#purchaseitemsTableBody').append(`
+                    updateTablePurchaseitems(response)
+                    valuePurchases(response)
+                    valueGoods(response)
+                    valueSuppliers(response)
+                }
+            });
+        }
+
+        function updateTablePurchaseitems(response) {
+            $('#purchaseitemsTableBody').empty();
+            const purchaseitems = response.purchaseitems;
+            for (let i = 0; i < purchaseitems.length; i++) {
+                const itemcode = purchaseitems[i].itemcode;
+                const name = purchaseitems[i].name;
+                const quantity = purchaseitems[i].quantity;
+                const purchaseprice = purchaseitems[i].purchaseprice;
+                const toFormatPP = purchaseprice * 1
+                const totalprice = purchaseitems[i].totalprice;
+                const toFormatTP = totalprice * 1
+                $('#purchaseitemsTableBody').append(`
                         <tr>
                             <td>${i + 1}</td>
                             <td>${itemcode}</td>
@@ -194,7 +205,95 @@
                             <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
                         </tr>
                         `);
+            }
+        }
+
+        function valuePurchases(response) {
+            // value input purchase
+            const { invoice, time, totalsum } = response.purchasesData
+            $('#invoice').val(invoice)
+            $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
+            $('#operator').val(response.operator.name)
+            const formattedTS = totalsum * 1
+            $('#totalsumInput').val(formatRupiah(formattedTS.toString(), "Rp. "))
+        }
+
+        function valueGoods(response) {
+            // Value Input Goods
+            response.goodsData.forEach(function (item) {
+                $('#barcode').append($('<option>', {
+                    value: item.barcode,
+                    text: item.barcode + ' - ' + item.name,
+                }));
+            });
+
+            $('#barcode').prepend($('<option>', {
+                value: '',
+                text: 'Select Goods',
+                selected: true,
+                disabled: true
+            })).on('change', function () {
+                // Cari item dengan barcode yang dipilih
+                var selectedItem = response.goodsData.find(function (item) {
+                    return item.barcode === this.value;
+                }, this);
+
+                // Tampilkan data dalam input value lain
+                if (selectedItem) {
+                    $('#goods_name').val(selectedItem.name);
+                    $('#stock').val(selectedItem.stock);
+                    const purchasePriceNumber = selectedItem.purchaseprice * 1
+                    $('#purchaseprice').val(formatRupiah(purchasePriceNumber.toString(), "Rp. "));
+                    $('#quantity').val('')
+                    $('#totalprice').val('')
+                } else {
+                    $('#goods_name').val('');
+                    $('#stock').val('')
+                    $('#purchaseprice').val('');
+                }
+
+                // perkalian quantity otomatis 
+                $('#quantity').on('keyup', function () {
+                    var quantity = this.value;
+                    var purchaseprice = selectedItem.purchaseprice;
+
+                    if (!isNaN(quantity) && !isNaN(purchaseprice)) {
+                        const hasilKali = quantity * purchaseprice
+                        $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
+                    } else {
+                        $('#totalprice').val('');
                     }
+                });
+            });
+        }
+
+        function valueSuppliers(response) {
+            // Tampilkan Select Option Suppliers
+            const suppliersData = response.suppliersData
+            suppliersData.forEach(function (item) {
+                $('#select_supplier').append($('<option>', {
+                    value: item.supplierid,
+                    text: item.name,
+                }));
+            });
+
+            $('#select_supplier').prepend($('<option>', {
+                value: '',
+                text: 'Select Supplier',
+                selected: true,
+                disabled: true
+            }))
+        }
+
+        function putPurchaseitems() {
+            $.ajax({
+                url: "http://localhost:3000/api/purchases/add",
+                type: "put",
+                data: params,
+                success: function (response) {
+                    updateTablePurchaseitems(response)
+                    const totalsum = response.totalsum * 1
+                    $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
                 }
             });
         }
@@ -239,85 +338,7 @@
         $(document).ready(function () {
 
             // Tampilkan table purchaseitems
-            readDataPurchaseitems()
-
-            // Ambil Data Purchases dan purchaseitems
-            $.ajax({
-                url: "http://localhost:3000/api/purchases/add",
-                method: "GET",
-                success: function (response) {
-                    // value input purchase
-                    const { invoice, time, totalsum } = response.purchasesData
-                    $('#invoice').val(invoice)
-                    $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
-                    $('#operator').val(response.operator.name)
-                    const formattedTS = totalsum * 1
-                    $('#totalsumInput').val(formatRupiah(formattedTS.toString(), "Rp. "))
-
-                    // Value Input Goods
-                    response.goodsData.forEach(function (item) {
-                        $('#barcode').append($('<option>', {
-                            value: item.barcode,
-                            text: item.barcode + ' - ' + item.name,
-                        }));
-                    });
-
-                    $('#barcode').prepend($('<option>', {
-                        value: '',
-                        text: 'Select Goods',
-                        selected: true,
-                        disabled: true
-                    })).on('change', function () {
-                        // Cari item dengan barcode yang dipilih
-                        var selectedItem = response.goodsData.find(function (item) {
-                            return item.barcode === this.value;
-                        }, this);
-
-                        // Tampilkan data dalam input value lain
-                        if (selectedItem) {
-                            $('#goods_name').val(selectedItem.name);
-                            $('#stock').val(selectedItem.stock);
-                            const purchasePriceNumber = selectedItem.purchaseprice * 1
-                            $('#purchaseprice').val(formatRupiah(purchasePriceNumber.toString(), "Rp. "));
-                            $('#quantity').val('')
-                            $('#totalprice').val('')
-                        } else {
-                            $('#goods_name').val('');
-                            $('#stock').val('')
-                            $('#purchaseprice').val('');
-                        }
-
-                        // perkalian quantity otomatis 
-                        $('#quantity').on('keyup', function () {
-                            var quantity = this.value;
-                            var purchaseprice = selectedItem.purchaseprice;
-
-                            if (!isNaN(quantity) && !isNaN(purchaseprice)) {
-                                const hasilKali = quantity * purchaseprice
-                                $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
-                            } else {
-                                $('#totalprice').val('');
-                            }
-                        });
-                    });
-
-                    // Tampilkan Select Option Suppliers
-                    const suppliersData = response.suppliersData
-                    suppliersData.forEach(function (item) {
-                        $('#select_supplier').append($('<option>', {
-                            value: item.supplierid,
-                            text: item.name,
-                        }));
-                    });
-
-                    $('#select_supplier').prepend($('<option>', {
-                        value: '',
-                        text: 'Select Supplier',
-                        selected: true,
-                        disabled: true
-                    }))
-                }
-            });
+            readData()
 
             // kirimkan Data Supplier ke Controller
             $("#finish").click(function () {
@@ -351,43 +372,13 @@
                 const invoice = $('#invoice').val()
                 const quantity = $('#quantity').val()
 
-                let params = { barcode, purchasePriceNumber, totalPriceNumber, invoice, quantity }
+                params = { ...params, barcode, purchasePriceNumber, totalPriceNumber, invoice, quantity }
 
                 if (!barcode || !purchasePriceNumber || !totalPriceNumber || !invoice || !quantity) {
                     // do nothing. biar ga error aja
                 } else {
                     // Mengirim data menggunakan ajax
-                    $.ajax({
-                        url: "http://localhost:3000/api/purchases/add",
-                        type: "put",
-                        data: params,
-                        success: function (response) {
-                            $('#purchaseitemsTableBody').empty();
-                            const purchaseitems = response.purchaseitems;
-                            for (let i = 0; i < purchaseitems.length; i++) {
-                                const itemcode = purchaseitems[i].itemcode;
-                                const name = purchaseitems[i].name;
-                                const quantity = purchaseitems[i].quantity;
-                                const purchaseprice = purchaseitems[i].purchaseprice;
-                                const toFormatPP = purchaseprice * 1
-                                const totalprice = purchaseitems[i].totalprice;
-                                const toFormatTP = totalprice * 1
-                                $('#purchaseitemsTableBody').append(`
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td>${itemcode}</td>
-                            <td>${name}</td>
-                            <td>${quantity}</td>
-                            <td>${formatRupiah(toFormatPP.toString(), "Rp. ")}</td>
-                            <td>${formatRupiah(toFormatTP.toString(), "Rp. ")}</td>
-                        </tr>
-                        `);
-                            }
-
-                            const totalsum = response.totalsum * 1
-                            $('#totalsumInput').val(formatRupiah(totalsum.toString(), "Rp. "))
-                        }
-                    });
+                    putPurchaseitems()
                 }
             });
         });

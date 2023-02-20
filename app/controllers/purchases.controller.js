@@ -69,10 +69,18 @@ exports.getPurchases = async (req, res) => {
         // Eksekusi query
         const { rows } = await db.query(sql, values);
 
+        // Ambil data untuk alerts
+        let goodsAlert = null
+        if (role == 'admin') {
+            const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+            goodsAlert = goods.rows
+        }
+
         // Render halaman
         res.render('./purchases/purchases', {
             name,
             role,
+            goodsAlert,
             userid,
             rows,
             page,
@@ -98,14 +106,8 @@ exports.getPurchases = async (req, res) => {
 
 }
 
-exports.postPurchases = async (req, res) => {
-    const { userid } = req.session.user
-    const insert = await db.query('INSERT INTO purchases(totalsum, operator) VALUES($1, $2)', ['0', userid])
-    res.redirect('/purchases/add')
-}
-
 exports.getAPIAddPurchases = async (req, res) => {
-    const { user } = req.session
+    const { userid } = req.session.user
 
     // Ambil Data Goods
     async function getGoodsData() {
@@ -116,13 +118,14 @@ exports.getAPIAddPurchases = async (req, res) => {
     const goodsData = await getGoodsData()
 
     // ambil data purchases terbaru
-    async function getPurchasesData() {
-        const { rows } = await db.query('SELECT * FROM purchases ORDER BY time ASC')
-        const purchasesData = rows.pop()
+    async function getPurchasesData(userid) {
+        const {rows} = await db.query('INSERT INTO purchases(totalsum, operator) VALUES($1, $2) RETURNING *', ['0', userid])
+        const purchasesData = rows[0]
         return purchasesData
     }
-    const purchasesData = await getPurchasesData()
+    const purchasesData = await getPurchasesData(userid)
     const invoice = purchasesData.invoice
+    console.log(purchasesData)
 
     // Ambil Data purchaseitems & nama barang berdasarkan invoice
     async function getPurchaseitems(invoice) {
@@ -144,7 +147,7 @@ exports.getAPIAddPurchases = async (req, res) => {
     }
     const suppliersData = await getSuppliersData()
 
-    res.json({ purchasesData, operator: user, goodsData, purchaseitems, suppliersData })
+    res.json({ purchasesData, operator: req.session.user, goodsData, purchaseitems, suppliersData })
 }
 
 exports.putAPIAddPurchases = async (req, res) => {
@@ -186,7 +189,15 @@ exports.postAPIAddPurchases = async (req, res) => {
 
 exports.getAddPurchases = async (req, res) => {
     const { name, role } = req.session.user
-    res.render('./purchases/purchasesAdd', { name, role })
+
+    // Ambil data untuk alerts
+    let goodsAlert = null
+    if (role == 'admin') {
+      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+      goodsAlert = goods.rows
+    }
+
+    res.render('./purchases/purchasesAdd', { name, role, goodsAlert })
 }
 
 exports.getAPIEditPurchases = async (req, res) => {
@@ -264,9 +275,16 @@ exports.getEditPurchases = async (req, res) => {
     const { name, role, userid } = req.session.user
     const { invoice } = req.params
 
+    // Ambil data untuk alerts
+    let goodsAlert = null
+    if (role == 'admin') {
+      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+      goodsAlert = goods.rows
+    }
+
     if (role === 'admin') {
         // Jika user adalah admin, maka abaikan semua validasi
-        return res.render('./purchases/purchasesEdit', { name, role, invoice })
+        return res.render('./purchases/purchasesEdit', { name, role, invoice, goodsAlert })
     }
     // Validasi invoice berdasarkan user
     const { rows } = await db.query('SELECT invoice FROM purchases WHERE operator = $1', [userid])
@@ -279,7 +297,7 @@ exports.getEditPurchases = async (req, res) => {
     }
 
     if (found) {
-        res.render('./purchases/purchasesEdit', { name, role, invoice })
+        res.render('./purchases/purchasesEdit', { name, role, invoice, goodsAlert })
     } else {
         res.status(403).send('Forbidden');
     }
