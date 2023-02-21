@@ -27,14 +27,16 @@ EXECUTE FUNCTION update_purchase_total_sum();
 CREATE OR REPLACE FUNCTION restart_invoice_sequence()
 RETURNS TRIGGER AS $$
 DECLARE
-invoice_suffix text;
+  invoice_suffix text;
+  prev_invoice text;
 BEGIN
-IF (to_char(now(), 'YYYYMMDD') != substring(OLD.invoice, 5, 8)) THEN
-ALTER SEQUENCE no_urut RESTART WITH 1;
-END IF;
-SELECT cast(nextval('no_urut') as text) INTO invoice_suffix;
-NEW.invoice := 'INV-' || to_char(NOW(), 'YYYYMMDD') || '-' || invoice_suffix;
-RETURN NEW;
+  SELECT invoice INTO prev_invoice FROM purchases ORDER BY invoice DESC LIMIT 1 OFFSET 1;
+  IF (prev_invoice IS NULL OR to_char(now(), 'YYYYMMDD') != substring(prev_invoice, 5, 8)) THEN
+    ALTER SEQUENCE no_urut RESTART WITH 1;
+  END IF;
+  SELECT cast(nextval('no_urut') as text) INTO invoice_suffix;
+  NEW.invoice := 'INV-' || to_char(NOW(), 'YYYYMMDD') || '-' || invoice_suffix;
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -99,9 +101,11 @@ CREATE OR REPLACE FUNCTION restart_invoice_penj_sequence()
 RETURNS TRIGGER AS $$
 DECLARE
 invoice_suffix text;
-BEGINs
-IF (to_char(now(), 'YYYYMMDD') != substring(OLD.invoice, 9, 8)) THEN
-ALTER SEQUENCE no_urut RESTART WITH 1;
+prev_invoice text;
+BEGIN
+SELECT invoice INTO prev_invoice FROM sales ORDER BY invoice DESC LIMIT 1 OFFSET 1;
+IF (prev_invoice IS NULL OR to_char(now(), 'YYYYMMDD') != substring(prev_invoice, 9, 8)) THEN
+ALTER SEQUENCE no_urut_penj RESTART WITH 1;
 END IF;
 SELECT cast(nextval('no_urut_penj') as text) INTO invoice_suffix;
 NEW.invoice := 'INV-PENJ' || to_char(NOW(), 'YYYYMMDD') || '-' || invoice_suffix;
