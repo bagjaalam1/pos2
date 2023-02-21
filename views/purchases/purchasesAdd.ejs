@@ -46,7 +46,6 @@
                         <fieldset class="">
                             <label>Goods Barcode</label>
                             <select name="barcode" class="form-control mb-2 mr-sm-2 mb-sm-0" id="barcode">
-
                             </select>
                         </fieldset>
                         <br>
@@ -167,6 +166,7 @@
 
     <script>
         moment.locale("id")
+        const formatter = IDRupiah()
         var params = {
 
         }
@@ -224,13 +224,14 @@
                 $('#barcode').append($('<option>', {
                     value: item.barcode,
                     text: item.barcode + ' - ' + item.name,
+                    selected: '<%=query.barcode%>' == item.barcode ? true : false
                 }));
             });
 
             $('#barcode').prepend($('<option>', {
                 value: '',
                 text: 'Select Goods',
-                selected: true,
+                selected: '<%=query.barcode%>' ? false : true,
                 disabled: true
             })).on('change', function () {
                 // Cari item dengan barcode yang dipilih
@@ -265,6 +266,24 @@
                     }
                 });
             });
+
+            if ('<%=query.barcode%>') {
+                $('#goods_name').val('<%=query.goodsname%>')
+                $('#stock').val('<%=query.stock%>')
+                $('#purchaseprice').val(formatter.format('<%=query.purchaseprice%>'))
+
+                $('#quantity').on('keyup', function () {
+                    const quantity = this.value
+                    const purchaseprice = '<%=query.purchaseprice%>'
+
+                    if (!isNaN(quantity) && !isNaN(purchaseprice)) {
+                        const hasilKali = quantity * purchaseprice
+                        $('#totalprice').val(formatRupiah(hasilKali.toString(), "Rp. "));
+                    } else {
+                        $('#totalprice').val('');
+                    }
+                })
+            }
         }
 
         function valueSuppliers(response) {

@@ -5,7 +5,6 @@ module.exports = (app) => {
     const controller = require('../controllers/sales.controller')
 
     router.get('/sales', isLoggedIn, controller.getSales)
-    router.post('/sales', isLoggedIn, controller.postSales)
     router.get('/sales/add', isLoggedIn, controller.getAddSales)
     router.get('/sales/edit/:invoice', isLoggedIn, controller.getEditSales)
     router.get('/sales/delete/:invoice', isLoggedIn, controller.deleteSales)

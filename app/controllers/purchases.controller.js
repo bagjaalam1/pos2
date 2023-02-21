@@ -4,6 +4,10 @@ const moment = require('moment')
 
 exports.getPurchases = async (req, res) => {
     try {
+
+        //bersihkan data kosong
+        const deleteData = await db.query('DELETE FROM purchases WHERE totalsum = $1', ['0'])
+
         // Ambil data dari user session 
         const { name, role, userid } = req.session.user
 
@@ -58,7 +62,7 @@ exports.getPurchases = async (req, res) => {
         const pages = Math.ceil(totalResult.rows[0].total / limit);
 
         // Query untuk mengambil data
-        sql = 'SELECT purchases.invoice, purchases.time, purchases.totalsum, suppliers.name, purchases.operator FROM purchases INNER JOIN suppliers ON purchases.supplier = suppliers.supplierid';
+        sql = 'SELECT purchases.invoice, purchases.time, purchases.totalsum, suppliers.name, purchases.operator FROM purchases LEFT JOIN suppliers ON purchases.supplier = suppliers.supplierid';
         // Jika ada pencarian
         if (wheres.length > 0) {
             sql += ` WHERE ${wheres.join()}`;
@@ -119,13 +123,12 @@ exports.getAPIAddPurchases = async (req, res) => {
 
     // ambil data purchases terbaru
     async function getPurchasesData(userid) {
-        const {rows} = await db.query('INSERT INTO purchases(totalsum, operator) VALUES($1, $2) RETURNING *', ['0', userid])
+        const { rows } = await db.query('INSERT INTO purchases(totalsum, operator) VALUES($1, $2) RETURNING *', ['0', userid])
         const purchasesData = rows[0]
         return purchasesData
     }
     const purchasesData = await getPurchasesData(userid)
     const invoice = purchasesData.invoice
-    console.log(purchasesData)
 
     // Ambil Data purchaseitems & nama barang berdasarkan invoice
     async function getPurchaseitems(invoice) {
@@ -189,15 +192,17 @@ exports.postAPIAddPurchases = async (req, res) => {
 
 exports.getAddPurchases = async (req, res) => {
     const { name, role } = req.session.user
+    const query = req.query
+    console.log(query)
 
     // Ambil data untuk alerts
     let goodsAlert = null
     if (role == 'admin') {
-      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
-      goodsAlert = goods.rows
+        const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+        goodsAlert = goods.rows
     }
 
-    res.render('./purchases/purchasesAdd', { name, role, goodsAlert })
+    res.render('./purchases/purchasesAdd', { name, role, goodsAlert, query })
 }
 
 exports.getAPIEditPurchases = async (req, res) => {
@@ -278,8 +283,8 @@ exports.getEditPurchases = async (req, res) => {
     // Ambil data untuk alerts
     let goodsAlert = null
     if (role == 'admin') {
-      const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
-      goodsAlert = goods.rows
+        const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
+        goodsAlert = goods.rows
     }
 
     if (role === 'admin') {

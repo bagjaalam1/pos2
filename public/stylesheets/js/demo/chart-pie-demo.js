@@ -4,10 +4,10 @@ Chart.defaults.global.defaultFontColor = '#858796';
 
 // Pie Chart Example
 function chartPie(response) {
-  const { data } = response
+  const { salesCustomer } = response
   const customerCounts = [0, 0];
-  data.forEach(row => {
-    if (row.customer !== null) {
+  salesCustomer.forEach(row => {
+    if (row.customer === null) {
       customerCounts[0]++;
     } else {
       customerCounts[1]++;

@@ -10,6 +10,9 @@ exports.getSales = async (req, res) => {
         // Ambil data dari req.query
         const { searchValue, display } = req.query;
 
+        //bersihkan data kosong
+        const deleteData = await db.query('DELETE FROM sales WHERE totalsum = $1', ['0'])
+
         // Sorting
         const sortBy = req.query.sortBy || 'invoice'
         const sortMode = req.query.sortMode || 'asc'
@@ -108,13 +111,6 @@ exports.getSales = async (req, res) => {
 
 }
 
-exports.postSales = async (req, res) => {
-    const operator = req.session.user.userid
-    const insert = await db.query('INSERT INTO sales(totalsum, pay, change, operator) VALUES($1, $2, $3, $4)',
-        ['0', '0', '0', operator])
-    res.redirect('/sales/add')
-}
-
 exports.getAddSales = async (req, res) => {
     const { name, role } = req.session.user
 
@@ -159,7 +155,7 @@ exports.getEditSales = async (req, res) => {
 
 // API
 exports.getAPIAddSales = async (req, res) => {
-    const operator = req.session.user
+    const {userid} = req.session.user
 
     // Ambil Data Goods
     async function getGoodsData() {
@@ -171,8 +167,9 @@ exports.getAPIAddSales = async (req, res) => {
 
     // ambil data sales terbaru
     async function getSalesData() {
-        const { rows } = await db.query('SELECT * FROM sales ORDER BY time ASC')
-        const salesData = rows.pop()
+        const {rows} = await db.query('INSERT INTO sales(totalsum, pay, change, operator) VALUES($1, $2, $3, $4) RETURNING *',
+        ['0', '0', '0', userid])
+        const salesData = rows[0]
         return salesData
     }
     const salesData = await getSalesData()
@@ -198,7 +195,7 @@ exports.getAPIAddSales = async (req, res) => {
     }
     const customersData = await getCustomersData()
 
-    res.json({ salesData, operator, goodsData, saleitems, customersData })
+    res.json({ salesData, operator: req.session.user, goodsData, saleitems, customersData })
 }
 
 exports.putAPIAddSales = async (req, res) => {
@@ -217,14 +214,16 @@ exports.putAPIAddSales = async (req, res) => {
         return saleitems
     }
     const saleitems = await getSaleitems(invoice)
+    console.log(saleitems)
 
     // Ambil Data salesData(totalsum, pay, change)
     async function getSalesData() {
         const { rows } = await db.query('SELECT totalsum, pay, change FROM sales WHERE invoice = $1', [invoice])
-        const salesData = rows
+        const salesData = rows[0]
         return salesData
     }
     const salesData = await getSalesData(invoice)
+    console.log(salesData)
 
     res.json({ saleitems, salesData })
 }

@@ -10,12 +10,13 @@ exports.getDashboard = async (req, res) => {
       return res.status(403).send('Forbidden');
     }
 
+    // Ambil data untuk alerts
     let goodsAlert = null
     if (role == 'admin') {
       const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
       goodsAlert = goods.rows
     }
-    
+
     res.render('dashboard', { name, role, goodsAlert })
 
   } catch (e) {
@@ -89,16 +90,14 @@ exports.putAPIDashboard = async (req, res) => {
         TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
         COALESCE(s.revenue, 0) AS revenue, 
         COALESCE(p.expense, 0) AS expense,
-        COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning,
-        s.customer
+        COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning
       FROM (
         SELECT 
           TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
-          SUM(totalsum) AS revenue,
-          customer
+          SUM(totalsum) AS revenue
         FROM sales
         ${whereClause}
-        GROUP BY sales_month, customer
+        GROUP BY sales_month
       ) AS s
       FULL OUTER JOIN (
         SELECT 
@@ -124,16 +123,14 @@ exports.putAPIDashboard = async (req, res) => {
   TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
   COALESCE(s.revenue, 0) AS revenue, 
   COALESCE(p.expense, 0) AS expense,
-  COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning,
-  s.customer
+  COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning
 FROM (
   SELECT 
     TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
-    SUM(totalsum) AS revenue,
-    customer
+    SUM(totalsum) AS revenue
   FROM sales
   ${whereClause}
-  GROUP BY sales_month, customer
+  GROUP BY sales_month
 ) AS s
 FULL OUTER JOIN (
   SELECT 
@@ -148,7 +145,6 @@ FULL OUTER JOIN (
 
     // Tambahkan limit, offset, sortby, dan sortmode
     sql += ` ORDER BY ${sortBy} ${sortMode} LIMIT ${limit} OFFSET ${offset}`;
-
     // Eksekusi query
     const { rows } = await db.query(sql, values);
 
@@ -230,16 +226,14 @@ exports.putAPIEarningsData = async (req, res) => {
   TO_CHAR(TO_DATE(COALESCE(p.purchases_month, s.sales_month), 'Mon YY'), 'Mon YY') AS month, 
   COALESCE(s.revenue, 0) AS revenue, 
   COALESCE(p.expense, 0) AS expense,
-  COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning,
-  s.customer
+  COALESCE(s.revenue, 0) - COALESCE(p.expense, 0) AS earning
   FROM (
   SELECT 
     TO_CHAR(DATE_TRUNC('month', time), 'Mon YY') AS sales_month, 
-    SUM(totalsum) AS revenue,
-    customer
+    SUM(totalsum) AS revenue
     FROM sales
   ${whereClause}
-  GROUP BY sales_month, customer
+  GROUP BY sales_month
   ) AS s
   FULL OUTER JOIN (
   SELECT 
@@ -255,7 +249,15 @@ exports.putAPIEarningsData = async (req, res) => {
 
   const { rows } = await db.query(sql, values);
 
+  sql = `SELECT customer FROM sales ${whereClause}`
+
+  //get data customer from sales
+  const getData = await db.query(sql, values)
+  const salesCustomer = getData.rows
+  console.log(salesCustomer)
+
   res.json({
-    data: rows
+    data: rows,
+    salesCustomer
   })
 }

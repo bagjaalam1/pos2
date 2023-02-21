@@ -315,22 +315,21 @@
                     updateTableEarnings(response.rows)
                     pagination(response.page, response.pages)
                     sort()
-                    updateDataCard(response.rows)
                 }
             });
         }
 
-        const updateDataCard = (rows) => {
-            const totalRevenue = rows.reduce((total, row) => {
+        const updateDataCard = (response) => {
+            const totalRevenue = response.data.reduce((total, row) => {
                 const revenue = Number(row.revenue) || 0;
                 return total + revenue;
             }, 0);
-            const totalExpense = rows.reduce((total, row) => {
+            const totalExpense = response.data.reduce((total, row) => {
                 const expense = Number(row.expense) || 0;
                 return total + expense;
             }, 0);
             const earnings = totalRevenue - totalExpense
-            const totalSales = rows.filter(row => row.revenue !== null).length;
+            const totalSales = response.salesCustomer.length
 
             $('#text-sales').html(formatter.format(totalRevenue))
             $('#text-purchases').html(formatter.format(totalExpense))
@@ -432,7 +431,7 @@
             });
         }
 
-        function getData() {
+        function getAllData() {
             $.ajax({
                 type: 'PUT',
                 url: '/api/earnings',
@@ -441,6 +440,7 @@
                     generateReport(response.data)
                     chartArea(response)
                     chartPie(response)
+                    updateDataCard(response)
                 }
             });
         }
@@ -459,7 +459,7 @@
 
         $(document).ready(function () {
             readandPutData()
-            getData()
+            getAllData()
 
             $('#dateForm').on('submit', function (e) {
                 e.preventDefault(); // menghentikan form dari submit ke halaman baru
@@ -469,7 +469,7 @@
                 const page = 1
                 params = { ...params, startDate, endDate, page }
                 readandPutData()
-                getData()
+                getAllData()
             });
 
             $('#pagination').on('click', '.page-item', function () {

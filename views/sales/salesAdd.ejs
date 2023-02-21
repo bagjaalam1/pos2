@@ -274,21 +274,7 @@
                     } else {
                         $('#totalprice').val('');
                     }
-                });// Tampilkan Select Option Customers
-                const customersData = response.customersData
-                customersData.forEach(function (item) {
-                    $('#select_customer').append($('<option>', {
-                        value: item.customerid,
-                        text: item.name,
-                    }));
                 });
-
-                $('#select_customer').prepend($('<option>', {
-                    value: '',
-                    text: 'Select Customer',
-                    selected: true,
-                    disabled: true
-                }))
             });
         }
 
@@ -301,6 +287,11 @@
                     text: item.name,
                 }));
             });
+
+            $('#select_customer').prepend($('<option>', {
+                value: '',
+                text: 'None',
+            }))
 
             $('#select_customer').prepend($('<option>', {
                 value: '',
@@ -318,7 +309,7 @@
                 success: function (response) {
                     updateTableSaleitems(response)
 
-                    const { totalsum, pay, change } = response
+                    const { totalsum, pay, change } = response.salesData
                     $('#totalsumInput').val(formatter.format(totalsum))
                     $('#payInput').val(formatter.format(pay))
                     $('#changeInput').val(formatter.format(change))
