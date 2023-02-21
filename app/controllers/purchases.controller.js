@@ -330,7 +330,15 @@ exports.deleteAPIEditPurchases = async (req, res) => {
 
     const { id } = req.params
     const deletePurchaseitems = await db.query('DELETE FROM purchaseitems WHERE id = $1', [id])
-    res.json({})
+
+    // Ambil Data purchasesData(totalsum)
+    async function getPurchasesData() {
+        const { rows } = await db.query('SELECT totalsum FROM purchases WHERE invoice = $1', [invoice])
+        const purchasesData = rows
+        return purchasesData
+    }
+    const purchasesData = await getPurchasesData(invoice)
+    res.json({purchasesData})
 }
 
 exports.deletePurchases = async (req, res) => {

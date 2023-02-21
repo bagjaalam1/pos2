@@ -16,7 +16,7 @@ exports.getDashboard = async (req, res) => {
       const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
       goodsAlert = goods.rows
     }
-
+    console.log(goodsAlert)
     res.render('dashboard', { name, role, goodsAlert })
 
   } catch (e) {
@@ -254,7 +254,6 @@ exports.putAPIEarningsData = async (req, res) => {
   //get data customer from sales
   const getData = await db.query(sql, values)
   const salesCustomer = getData.rows
-  console.log(salesCustomer)
 
   res.json({
     data: rows,

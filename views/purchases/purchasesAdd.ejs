@@ -317,19 +317,6 @@
             });
         }
 
-        function postSuppliersData(data) {
-            $("#finish").click(function () {
-                $.ajax({
-                    type: "POST",
-                    url: "http://localhost:3000/api/purchases/add",
-                    data: { data },
-                    success: function () {
-                        window.location.href = '/purchases'
-                    }
-                });
-            });
-        }
-
         //catatan: agar tidak terjadi bug, kalikan 1 pada angka untuk memastikan tidak ada scale di belakang angka
         //kemudian ubah menjadi string
         function formatRupiah(angka, prefix) {

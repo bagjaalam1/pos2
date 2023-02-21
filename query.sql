@@ -30,7 +30,7 @@ DECLARE
   invoice_suffix text;
   prev_invoice text;
 BEGIN
-  SELECT invoice INTO prev_invoice FROM purchases ORDER BY invoice DESC LIMIT 1 OFFSET 1;
+  SELECT invoice INTO prev_invoice FROM purchases ORDER BY invoice DESC LIMIT 1 OFFSET 0;
   IF (prev_invoice IS NULL OR to_char(now(), 'YYYYMMDD') != substring(prev_invoice, 5, 8)) THEN
     ALTER SEQUENCE no_urut RESTART WITH 1;
   END IF;
@@ -103,7 +103,7 @@ DECLARE
 invoice_suffix text;
 prev_invoice text;
 BEGIN
-SELECT invoice INTO prev_invoice FROM sales ORDER BY invoice DESC LIMIT 1 OFFSET 1;
+SELECT invoice INTO prev_invoice FROM sales ORDER BY invoice DESC LIMIT 1 OFFSET 0;
 IF (prev_invoice IS NULL OR to_char(now(), 'YYYYMMDD') != substring(prev_invoice, 9, 8)) THEN
 ALTER SEQUENCE no_urut_penj RESTART WITH 1;
 END IF;

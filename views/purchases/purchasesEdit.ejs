@@ -17,8 +17,8 @@
                     <div class="col-sm-4">
                         <fieldset class="">
                             <label>Invoice</label>
-                            <input type="text" id="invoice" value="<%=invoice%>" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder=""
-                                disabled>
+                            <input type="text" id="invoice" value="<%=invoice%>"
+                                class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="" disabled>
                         </fieldset>
                     </div>
                     <div class="col-sm-4">
@@ -171,6 +171,7 @@
     <script>
         moment.locale("id")
         var invoice = $('#invoice').val()
+        var formatter = IDRupiah()
 
         function readDataPurchaseitems(invoice) {
 
@@ -189,7 +190,7 @@
                 method: "GET",
                 success: function (response) {
                     // value input purchase
-                    const {time, totalsum } = response.purchasesData[0]
+                    const { time, totalsum } = response.purchasesData[0]
                     $('#time').val(moment(time).format('DD MMM YYYY HH:mm:ss'))
                     $('#operator').val(response.operator.name)
                     const formattedTS = totalsum * 1
@@ -305,9 +306,12 @@
             $.ajax({
                 method: 'DELETE',
                 url: `http://localhost:3000/api/purchases/edit/delete/${id}`,
-                data: {invoice},
-                success: function(){
+                data: { invoice },
+                success: function (response) {
                     readDataPurchaseitems(invoice)
+                    const {totalsum} = response.purchasesData[0]
+                    $('#totalsumInput').val(formatter.format(totalsum))
+                    console.log(response)
                 }
             })
                 .fail(function () {

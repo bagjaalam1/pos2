@@ -265,7 +265,7 @@
                             selected: customersDataINV.customerid == item.customerid ? true : false
                         }));
                     });
-                    
+
                     $('#select_customer').prepend($('<option>', {
                         value: '',
                         text: 'none',
@@ -322,14 +322,13 @@
             $.ajax({
                 method: 'DELETE',
                 url: `http://localhost:3000/api/sales/edit/delete/${id}`,
-                data: {invoice},
+                data: { invoice },
                 success: function (response) {
                     readDataSaleitems(invoice)
                     const { totalsum, pay, change } = response.salesData[0]
                     $('#totalsumInput').val(formatter.format(totalsum))
                     $('#payInput').val(formatRupiah((pay * 1).toString()))
                     $('#changeInput').val(formatter.format(change))
-                    console.log(totalsum, pay, change)
                 }
             })
                 .fail(function () {
@@ -375,18 +374,18 @@
             // kirimkan Data Supplier ke Controller
             $("#finish").click(function () {
                 $.ajax({
-                        type: "POST",
-                        url: "http://localhost:3000/api/sales/add",
-                        data: {
-                            pay: toNumber($('#payInput').val()),
-                            change: pemecahRupiah($('#changeInput').val()),
-                            customerid: $('#select_customer').val(),
-                            invoice: $('#invoice').val()
-                        },
-                        success: function () {
-                            window.location.href = '/sales'
-                        }
-                    });
+                    type: "POST",
+                    url: "http://localhost:3000/api/sales/add",
+                    data: {
+                        pay: toNumber($('#payInput').val()),
+                        change: pemecahRupiah($('#changeInput').val()),
+                        customerid: $('#select_customer').val(),
+                        invoice: $('#invoice').val()
+                    },
+                    success: function () {
+                        window.location.href = '/sales'
+                    }
+                });
 
             });
 
@@ -399,7 +398,6 @@
                 const totalPriceNumber = pemecahRupiah(totalprice);
                 const invoice = $('#invoice').val()
                 const quantity = $('#quantity').val()
-                console.log(barcode, sellingPriceNumber, totalPriceNumber, quantity)
 
                 let params = { barcode, sellingPriceNumber, totalPriceNumber, invoice, quantity }
 
@@ -413,11 +411,10 @@
                         data: params,
                         success: function (response) {
                             updateSaleitems(response)
-                            const { totalsum, pay, change } = response.salesData[0]
+                            const { totalsum, pay, change } = response.salesData
                             $('#totalsumInput').val(formatter.format(totalsum))
                             $('#payInput').val(formatRupiah((pay * 1).toString()))
                             $('#changeInput').val(formatter.format(change))
-                            console.log(totalsum, pay, change)
                         }
                     });
                 }
@@ -433,8 +430,6 @@
             $('#payInput').keyup(function () {
                 const pay = toNumber($(this).val())
                 const total = pemecahRupiah($('#totalsumInput').val());
-                console.log(total)
-                console.log(pay)
                 const change = pay - total;
                 $(this).val(formatRupiah(pay.toString()))
                 if (change > 0) {
