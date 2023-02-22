@@ -1,5 +1,5 @@
 const db = require('../models/index')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
 exports.login = async (req, res) => {
