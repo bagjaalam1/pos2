@@ -37,6 +37,7 @@ exports.login = async (req, res) => {
     } catch (e) {
         req.flash('info', e)
         res.redirect('login')
+        console.error(e)
     }
 }
 
@@ -353,8 +354,6 @@ exports.postChangepassword = async (req, res) => {
     try {
         const { oldpassword, newpassword, repassword } = req.body
         const { password } = req.session.user
-        console.log(req.body)
-        console.log(password)
 
         //Validasi old password
         const match = await bcrypt.compare(oldpassword, password);
