@@ -187,7 +187,7 @@
         function readData() {
 
             $.ajax({
-                url: "http://localhost:3000/api/sales/add",
+                url: "/api/sales/add",
                 method: "GET",
                 success: function (response) {
                     updateTableSaleitems(response)
@@ -303,7 +303,7 @@
 
         function putSaleitems() {
             $.ajax({
-                url: "http://localhost:3000/api/sales/add",
+                url: "/api/sales/add",
                 type: "put",
                 data: params,
                 success: function (response) {
@@ -320,7 +320,7 @@
         function postSuppliersData(data) {
             $.ajax({
                 type: "POST",
-                url: "http://localhost:3000/api/sales/add",
+                url: "/api/sales/add",
                 data: {
                     pay: toNumber($('#payInput').val()),
                     change: pemecahRupiah($('#changeInput').val()),

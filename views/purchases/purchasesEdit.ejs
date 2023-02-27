@@ -176,7 +176,7 @@
         function readDataPurchaseitems(invoice) {
 
             $.ajax({
-                url: `http://localhost:3000/api/purchases/edit/${invoice}`,
+                url: `/api/purchases/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
                     updatePurchaseitems(response)
@@ -186,7 +186,7 @@
 
         function readPurchasesandGoodsData(invoice) {
             $.ajax({
-                url: `http://localhost:3000/api/purchases/edit/${invoice}`,
+                url: `/api/purchases/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
                     // value input purchase
@@ -261,7 +261,7 @@
             $("#finish").click(function () {
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:3000/api/purchases/add",
+                    url: "/api/purchases/add",
                     data: { data },
                     success: function () {
                         window.location.href = '/purchases'
@@ -305,7 +305,7 @@
         const deleteData = (id) => {
             $.ajax({
                 method: 'DELETE',
-                url: `http://localhost:3000/api/purchases/edit/delete/${id}`,
+                url: `/api/purchases/edit/delete/${id}`,
                 data: { invoice },
                 success: function (response) {
                     readDataPurchaseitems(invoice)
@@ -360,7 +360,7 @@
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: "http://localhost:3000/api/purchases/add",
+                        url: "/api/purchases/add",
                         data: {
                             supplierid: $('#select_supplier').val(),
                             invoice: $('#invoice').val()
@@ -391,7 +391,7 @@
                 } else {
                     // Mengirim data menggunakan ajax
                     $.ajax({
-                        url: "http://localhost:3000/api/purchases/add",
+                        url: "/api/purchases/add",
                         type: "put",
                         data: params,
                         success: function (response) {

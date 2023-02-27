@@ -187,7 +187,7 @@
         function readDataSaleitems(invoice) {
 
             $.ajax({
-                url: `http://localhost:3000/api/sales/edit/${invoice}`,
+                url: `/api/sales/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
                     updateSaleitems(response)
@@ -197,7 +197,7 @@
 
         function readSalesandGoodsData(invoice) {
             $.ajax({
-                url: `http://localhost:3000/api/sales/edit/${invoice}`,
+                url: `/api/sales/edit/${invoice}`,
                 method: "GET",
                 success: function (response) {
                     // value input sales
@@ -279,7 +279,7 @@
             $("#finish").click(function () {
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:3000/api/sales/add",
+                    url: "/api/sales/add",
                     data: { data },
                     success: function () {
                         window.location.href = '/sales'
@@ -321,7 +321,7 @@
         const deleteData = (id) => {
             $.ajax({
                 method: 'DELETE',
-                url: `http://localhost:3000/api/sales/edit/delete/${id}`,
+                url: `/api/sales/edit/delete/${id}`,
                 data: { invoice },
                 success: function (response) {
                     readDataSaleitems(invoice)
@@ -375,7 +375,7 @@
             $("#finish").click(function () {
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:3000/api/sales/add",
+                    url: "/api/sales/add",
                     data: {
                         pay: toNumber($('#payInput').val()),
                         change: pemecahRupiah($('#changeInput').val()),
@@ -406,7 +406,7 @@
                 } else {
                     // Mengirim data menggunakan ajax
                     $.ajax({
-                        url: "http://localhost:3000/api/sales/add",
+                        url: "/api/sales/add",
                         type: "put",
                         data: params,
                         success: function (response) {

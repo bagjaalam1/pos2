@@ -173,7 +173,7 @@
 
         function readData() {
             $.ajax({
-                url: "http://localhost:3000/api/purchases/add",
+                url: "/api/purchases/add",
                 method: "GET",
                 success: function (response) {
                     updateTablePurchaseitems(response)
@@ -306,7 +306,7 @@
 
         function putPurchaseitems() {
             $.ajax({
-                url: "http://localhost:3000/api/purchases/add",
+                url: "/api/purchases/add",
                 type: "put",
                 data: params,
                 success: function (response) {
@@ -355,7 +355,7 @@
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: "http://localhost:3000/api/purchases/add",
+                        url: "/api/purchases/add",
                         data: {
                             supplierid: $('#select_supplier').val(),
                             invoice: $('#invoice').val()
