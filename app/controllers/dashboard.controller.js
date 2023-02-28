@@ -16,7 +16,6 @@ exports.getDashboard = async (req, res) => {
       const goods = await db.query('SELECT * FROM goods WHERE stock <= 5')
       goodsAlert = goods.rows
     }
-    console.log(goodsAlert)
     res.render('dashboard', { name, role, goodsAlert })
 
   } catch (e) {
@@ -50,18 +49,17 @@ exports.putAPIDashboard = async (req, res) => {
     let whereClause = ''
     let searchClause = ''
     let count = 1
-
     // jika input date dimasukkan
     if (startDate && endDate) {
       wheres.push(`time BETWEEN $${count++} AND $${count++}`)
-      values.push(startDate)
-      values.push(endDate)
+      values.push(startDate + ' 00:00:00')
+      values.push(endDate + ' 23:59:59.999999')
     } else if (startDate) {
       wheres.push(`time >= $${count++}`)
-      values.push(startDate)
+      values.push(startDate + ' 00:00:00')
     } else if (endDate) {
       wheres.push(`time <= $${count++}`)
-      values.push(endDate)
+      values.push(endDate + ' 23:59:59.999999')
     }
 
     // Jika tanggal dimasukkan
@@ -192,14 +190,14 @@ exports.putAPIEarningsData = async (req, res) => {
   // jika input date dimasukkan
   if (startDate && endDate) {
     wheres.push(`time BETWEEN $${count++} AND $${count++}`)
-    values.push(startDate)
-    values.push(endDate)
+    values.push(startDate + ' 00:00:00')
+    values.push(endDate + ' 23:59:59.999999')
   } else if (startDate) {
     wheres.push(`time >= $${count++}`)
-    values.push(startDate)
+    values.push(startDate + ' 00:00:00')
   } else if (endDate) {
     wheres.push(`time <= $${count++}`)
-    values.push(endDate)
+    values.push(endDate + ' 23:59:59.999999')
   }
 
   // Jika tanggal dimasukkan
