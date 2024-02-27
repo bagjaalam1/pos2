@@ -293,7 +293,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
     try {
-        const { name, role } = req.session.user
+        const { name, role, email } = req.session.user
 
         // Ambil data untuk alerts
         let goodsAlert = null
@@ -302,7 +302,7 @@ exports.getProfile = async (req, res) => {
             goodsAlert = goods.rows
         }
 
-        res.render('users/profile', { name, role, infoSuccess: req.flash('infoSuccess'), goodsAlert })
+        res.render('users/profile', { name, role, email, infoSuccess: req.flash('infoSuccess'), goodsAlert })
     } catch (e) {
         res.send(e)
     }

@@ -2,6 +2,11 @@
 
 <%- include('../partials/header.ejs') %>
 
+    <!-- Page Heading -->
+    <div class="align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-1 text-gray-800">Customers</h1>
+    </div>
+
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Form Edit</h6>
@@ -25,7 +30,7 @@
                 <div class="row mb-3">
                     <label for="input3" class="col-sm-2 col-form-label">Phone</label>
                     <div class="col-sm-10">
-                        <input type="number" class="form-control" id="input3" name="phone" placeholder="0" value="<%=item.phone%>" required>
+                        <input type="text" class="form-control" id="input3" name="phone" value="<%=item.phone%>" required>
                     </div>
                 </div>
             </div>
